@@ -1,26 +1,13 @@
 {
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/dashboard",
-      "destination": "/html/dashboard.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/html/login.html"
-    },
-    {
-      "source": "/welcome",
-      "destination": "/html/welcome.html"
-    },
-    {
-      "source": "/profile",
-      "destination": "/html/profile.html"
+      "src": "**/*",
+      "use": "@vercel/static"
     }
   ],
+  "trailingSlash": false,
+  "cleanUrls": true,
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -31,7 +18,5 @@
         }
       ]
     }
-  ],
-  "trailingSlash": false,
-  "cleanUrls": true
+  ]
 }
