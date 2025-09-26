@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Bobolingo</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/welcome.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-container">
+            <div class="loading-logo">
+                <img src="../assets/loading-welcome.gif" alt="Loading Animation" class="loading-gif">
+            </div>
+            <div class="loading-text">Loading Bobolingo...</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <div class="loading-percentage">0%</div>
+        </div>
+    </div>
+
+    <!-- Main Welcome Content -->
+    <div id="welcomeContent" class="welcome-content" style="display: none;">
+        <!-- Header Navigation -->
+        <header class="header">
+            <nav class="navbar">
+                <div class="nav-container">
+                    <div class="logo">
+                        <img src="../assets/snoopy-removebg-preview.png" alt="Snoopy Logo" class="logo-icon">
+                        <a href="index.html" class="logo-link">Bobolingo</a>
+                    </div>
+                    
+                    <div class="nav-right">
+                        <div class="language-selector">
+                            <span class="language-text">SITE LANGUAGE</span>
+                            <div class="language-dropdown">
+                                <img src="https://cdn-icons-png.flaticon.com/128/9906/9906532.png" alt="English Flag" class="flag-icon">
+                                <span>EN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Welcome Section -->
+        <main class="main-content welcome-main">
+            <section class="welcome-section">
+                <div class="welcome-container">
+                    <div class="welcome-message">
+                        <div class="greeting-container">
+                            <h1 class="greeting-text">
+                                <span class="greeting-word">Hi!</span>
+                                <span class="typing-cursor">|</span>
+                            </h1>
+                        </div>
+                        
+                        <div class="mascot-container">
+                            <div class="mascot-image">
+                                <div class="mascot-placeholder">
+                                    <img src="../assets/snoppy-welcome-removebg-preview.png" alt="Snoopy Welcome" class="mascot-snoopy">
+                                </div>
+                                <div class="mascot-name">Bobo the Guide</div>
+                            </div>
+                        </div>
+                        
+                        <div class="welcome-intro">
+                            <p class="intro-text">
+                                Welcome to your language learning adventure! I'm Bobo, and I'll be your guide 
+                                as we explore english. Ready to start this exciting journey, TPBabes?
+                            </p>
+                        </div>
+                        
+                        <div class="continue-section">
+                            <button class="btn btn-primary continue-btn" onclick="startLearning()">
+                                CONTINUE
+                                <span class="btn-arrow">→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="../javascript/welcome.js"></script>
+</body>
+</html>

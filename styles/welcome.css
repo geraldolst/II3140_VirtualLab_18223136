@@ -1,0 +1,404 @@
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loading-container {
+    text-align: center;
+    color: white;
+}
+
+.loading-logo {
+    margin-bottom: 2rem;
+}
+
+.loading-gif {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.logo-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    backdrop-filter: blur(10px);
+}
+
+.logo-text {
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes logoSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.loading-bar {
+    width: 300px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    margin: 0 auto 1rem;
+    overflow: hidden;
+}
+
+.loading-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.3s ease;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -300px 0; }
+    100% { background-position: 300px 0; }
+}
+
+.loading-percentage {
+    font-size: 1.1rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* Welcome Content */
+.welcome-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.welcome-main {
+    margin-top: 80px;
+    padding: 2rem 0;
+}
+
+.welcome-section {
+    padding: 4rem 0;
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcome-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    text-align: center;
+    color: white;
+}
+
+.welcome-message {
+    animation: fadeInUp 1s ease 0.3s both;
+}
+
+/* Greeting Animation */
+.greeting-container {
+    margin-bottom: 3rem;
+}
+
+.greeting-text {
+    font-size: 4rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.greeting-word {
+    background: linear-gradient(45deg, #fff, #f0f8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: slideInLeft 0.8s ease 0.5s both;
+}
+
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-left: 0.5rem;
+    filter: drop-shadow(0 3px 10px rgba(255, 255, 255, 0.3));
+}
+
+.typing-cursor {
+    color: white;
+    animation: blink 1s infinite;
+}
+
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+/* Mascot Animation */
+.mascot-container {
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease 1s both;
+}
+
+.mascot-image {
+    position: relative;
+    display: inline-block;
+}
+
+.mascot-placeholder {
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    backdrop-filter: blur(10px);
+    animation: float 3s ease-in-out infinite;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mascot-character {
+    font-size: 4rem;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.mascot-snoopy {
+    width: 300px;
+    height: 300px;
+    object-fit: contain;
+    animation: bounce 2s ease-in-out infinite;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+}
+
+.mascot-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+/* Welcome Introduction */
+.welcome-intro {
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease 1.3s both;
+}
+
+.intro-text {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    opacity: 0.95;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Continue Section */
+.continue-section {
+    animation: fadeInUp 0.8s ease 1.6s both;
+}
+
+.continue-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    padding: 1.2rem 3rem;
+    background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.continue-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(79, 172, 254, 0.4);
+}
+
+.continue-btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-arrow {
+    transition: transform 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.continue-btn:hover .btn-arrow {
+    transform: translateX(5px);
+}
+
+/* Ripple Effect */
+.continue-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: all 0.6s ease;
+    transform: translate(-50%, -50%);
+}
+
+.continue-btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Fade In Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .greeting-text {
+        font-size: 2.5rem;
+    }
+    
+    .intro-text {
+        font-size: 1.1rem;
+    }
+    
+    .mascot-placeholder {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .mascot-character {
+        font-size: 3rem;
+    }
+    
+    .mascot-snoopy {
+        width: 400px;
+        height: 400px;
+    }
+    
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .loading-bar {
+        width: 250px;
+    }
+    
+    .logo-circle {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .loading-gif {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .logo-text {
+        font-size: 2.5rem;
+    }
+    
+    .welcome-container {
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .greeting-text {
+        font-size: 2rem;
+    }
+    
+    .continue-btn {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+    
+    .loading-text {
+        font-size: 1.2rem;
+    }
+    
+    .loading-bar {
+        width: 200px;
+    }
+    
+    .mascot-snoopy {
+        width: 400px;
+        height: 400px;
+    }
+    
+    .logo-icon {
+        width: 35px;
+        height: 35px;
+    }
+}

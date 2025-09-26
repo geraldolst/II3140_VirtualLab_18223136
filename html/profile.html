@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Bobolingo</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <link rel="stylesheet" href="../styles/profile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header dashboard-header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="dashboard.html" class="logo-link">Bobolingo</a>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="user-menu">
+                        <div class="user-avatar">
+                            <span class="avatar-letter" id="userInitial">J</span>
+                        </div>
+                        <span class="user-name" id="headerUserName">Loading...</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Profile Content -->
+    <div class="profile-container">
+        <main class="main-content profile-main">
+            <!-- Profile Header -->
+            <section class="profile-header">
+                <div class="profile-header-content">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-large">
+                            <span class="avatar-letter-large" id="profileInitial">J</span>
+                            <button class="avatar-edit-btn" title="Change Avatar">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-info">
+                        <h1 class="profile-name" id="profileName">Loading...</h1>
+                        <p class="profile-subtitle">Language Learner</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">15</span>
+                                <span class="stat-label">Day Streak</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">1,250</span>
+                                <span class="stat-label">XP Points</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">12</span>
+                                <span class="stat-label">Achievements</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Form -->
+            <section class="profile-form-section">
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-user-edit"></i>
+                            Profile Information
+                        </h2>
+                        <p class="card-subtitle">Update your personal information and preferences</p>
+                    </div>
+
+                    <form class="profile-form" id="profileForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName" class="form-label">
+                                    <i class="fas fa-user"></i>
+                                    Full Name
+                                </label>
+                                <input type="text" id="fullName" name="fullName" class="form-input" placeholder="Enter your full name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope"></i>
+                                    Email Address
+                                </label>
+                                <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nim" class="form-label">
+                                    <i class="fas fa-id-card"></i>
+                                    NIM
+                                </label>
+                                <input type="text" id="nim" name="nim" class="form-input" placeholder="Enter your NIM (optional)">
+                                <small class="form-help">You can update this later if needed</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phoneNumber" class="form-label">
+                                    <i class="fas fa-phone"></i>
+                                    Phone Number
+                                </label>
+                                <input type="tel" id="phoneNumber" name="phoneNumber" class="form-input" placeholder="Enter your phone number">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="birthDate" class="form-label">
+                                    <i class="fas fa-calendar"></i>
+                                    Date of Birth
+                                </label>
+                                <input type="date" id="birthDate" name="birthDate" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="language" class="form-label">
+                                    <i class="fas fa-globe"></i>
+                                    Preferred Language
+                                </label>
+                                <select id="language" name="language" class="form-select">
+                                    <option value="en">English</option>
+                                    <option value="id">Bahasa Indonesia</option>
+                                    <option value="es">Español</option>
+                                    <option value="fr">Français</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bio" class="form-label">
+                                <i class="fas fa-quote-left"></i>
+                                Bio
+                            </label>
+                            <textarea id="bio" name="bio" class="form-textarea" rows="4" placeholder="Tell us something about yourself..."></textarea>
+                        </div>
+
+                        <!-- Learning Preferences -->
+                        <div class="preferences-section">
+                            <h3 class="preferences-title">
+                                <i class="fas fa-cog"></i>
+                                Learning Preferences
+                            </h3>
+                            
+                            <div class="preference-group">
+                                <label class="preference-label">
+                                    <input type="checkbox" id="emailNotifications" class="preference-checkbox">
+                                    <span class="checkbox-custom"></span>
+                                    Email Notifications
+                                </label>
+                                <small class="preference-help">Receive learning reminders and updates</small>
+                            </div>
+
+                            <div class="preference-group">
+                                <label class="preference-label">
+                                    <input type="checkbox" id="dailyReminders" class="preference-checkbox">
+                                    <span class="checkbox-custom"></span>
+                                    Daily Learning Reminders
+                                </label>
+                                <small class="preference-help">Get notified to maintain your learning streak</small>
+                            </div>
+
+                            <div class="preference-group">
+                                <label class="preference-label">
+                                    <input type="checkbox" id="weeklyProgress" class="preference-checkbox">
+                                    <span class="checkbox-custom"></span>
+                                    Weekly Progress Reports
+                                </label>
+                                <small class="preference-help">Receive weekly summaries of your progress</small>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href='dashboard.html'">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Dashboard
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Sign Out Section -->
+            <section class="signout-section">
+                <div class="signout-card">
+                    <div class="signout-content">
+                        <div class="signout-icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </div>
+                        <div class="signout-info">
+                            <h3>Sign Out</h3>
+                            <p>Ready to take a break? You can always sign back in later.</p>
+                        </div>
+                        <button class="btn btn-outline-danger signout-btn" onclick="signOut()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Sign Out
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="../javascript/profile.js"></script>
+</body>
+</html>
