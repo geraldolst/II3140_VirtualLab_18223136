@@ -3,7 +3,7 @@
 **Virtual Lab Project for ITB First Year Students**  
 *Interactive platform to support English courses with engaging features and games*
 
-![Snoopy Logo](assets/snoopy-removebg-preview.png)
+![Snoopy Logo](assets/Snoopy-face-preview.png)
 
 ## 🌟 **Live Demo**
 **🚀 Website:** [https://https://bobolingolab.vercel.app/](https://bobolingolab.vercel.app/)
