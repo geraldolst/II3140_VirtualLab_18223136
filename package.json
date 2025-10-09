@@ -17,6 +17,9 @@
   ],
   "author": "Your Name",
   "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0"
+  },
   "devDependencies": {
     "serve": "^14.2.1"
   }

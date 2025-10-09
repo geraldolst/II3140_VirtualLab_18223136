@@ -136,11 +136,11 @@ function createUserDropdown() {
             </div>
             <div class="dropdown-divider"></div>
             <div class="dropdown-menu">
-                <a href="../html/login.html" class="dropdown-item">
+                <a href="login.html" class="dropdown-item">
                     <i class="fas fa-sign-in-alt"></i>
                     <span>Sign In</span>
                 </a>
-                <a href="../html/welcome.html" class="dropdown-item">
+                <a href="welcome.html" class="dropdown-item">
                     <i class="fas fa-user-plus"></i>
                     <span>Sign Up</span>
                 </a>
@@ -166,7 +166,7 @@ function createUserDropdown() {
             </div>
             <div class="dropdown-divider"></div>
             <div class="dropdown-menu">
-                <a href="../html/profile.html" class="dropdown-item">
+                <a href="profile.html" class="dropdown-item">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
                 </a>
@@ -340,7 +340,7 @@ function signOutFromDropdown() {
         localStorage.removeItem('bobolingoProfile');
         
         // Redirect to home page
-        window.location.href = '../html/index.html';
+        window.location.href = 'index.html';
     }
 }
 
@@ -404,28 +404,94 @@ function navigateToLessons(courseType) {
             lessonsSection.style.transform = 'translateY(0)';
             
             // Optional: Scroll to specific course based on courseType
-            if (courseType === 'fundamentals' || courseType === 'grammar') {
-                const targetCourse = document.querySelector(`.course-card:nth-child(${courseType === 'fundamentals' ? '1' : '2'})`);
-                if (targetCourse) {
-                    targetCourse.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Add highlight effect
-                    targetCourse.style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.3)';
-                    setTimeout(() => {
-                        targetCourse.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
-                    }, 2000);
-                }
-            }
+            console.log(`Navigating to ${courseType} course`);
         }, 50);
     }
 }
 
 // Grammar Checker functionality
 function initializeGrammarChecker() {
-    checkGrammarBtn.addEventListener('click', checkGrammar);
-    clearTextBtn.addEventListener('click', clearText);
-    grammarInput.addEventListener('input', updateCharacterCount);
+    if (checkGrammarBtn) {
+        checkGrammarBtn.addEventListener('click', checkGrammar);
+    }
+    
+    if (clearTextBtn) {
+        clearTextBtn.addEventListener('click', clearText);
+    }
+    
+    if (grammarInput) {
+        grammarInput.addEventListener('input', updateCharacterCount);
+    }
 }
 
+// Grammar check function
+function checkGrammar() {
+    const text = grammarInput.value.trim();
+    
+    if (!text) {
+        showError('Please enter some text to check.');
+        return;
+    }
+    
+    // Show loading state
+    grammarResults.innerHTML = `
+        <div class="loading-state" style="text-align: center; padding: 2rem;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #667eea; margin-bottom: 1rem;"></i>
+            <h3>Analyzing your text...</h3>
+            <p>Please wait while we check your grammar.</p>
+        </div>
+    `;
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+        const errors = simulateGrammarCheck(text);
+        displayGrammarResults(errors);
+    }, 2000);
+}
+
+// Simulate grammar checking (replace with actual API)
+function simulateGrammarCheck(text) {
+    const commonErrors = [
+        {
+            type: 'Spelling',
+            message: 'Possible spelling mistake found.',
+            suggestion: 'Check the spelling of technical terms.'
+        },
+        {
+            type: 'Grammar',
+            message: 'Consider revising sentence structure.',
+            suggestion: 'Try breaking long sentences into shorter ones.'
+        }
+    ];
+    
+    // Return random errors for demo
+    return Math.random() > 0.5 ? commonErrors : [];
+}
+
+// Display grammar results
+function displayGrammarResults(errors) {
+    if (errors.length === 0) {
+        grammarResults.innerHTML = `
+            <div class="success-message" style="text-align: center; padding: 2rem; color: #059669;">
+                <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <h3>Great job!</h3>
+                <p>No grammar issues found in your text.</p>
+            </div>
+        `;
+    } else {
+        let resultsHTML = '<h3>Grammar Check Results</h3>';
+        errors.forEach(error => {
+            resultsHTML += `
+                <div class="error-item">
+                    <div class="error-type">${error.type}</div>
+                    <div class="error-message">${error.message}</div>
+                    <div class="error-suggestion">${error.suggestion}</div>
+                </div>
+            `;
+        });
+        grammarResults.innerHTML = resultsHTML;
+    }
+}
 
 // Clear text function
 function clearText() {
@@ -494,32 +560,14 @@ document.addEventListener('DOMContentLoaded', function() {
     lessonCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-5px)';
-            this.style.boxShadow = '0 10px 30px rgba(102, 126, 234, 0.15)';
+            this.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.12)';
         });
         
         card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(-2px)';
+            this.style.transform = 'translateY(0)';
             this.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
         });
     });
-});
-
-// Add keyboard shortcuts
-document.addEventListener('keydown', function(event) {
-    // Ctrl/Cmd + Enter to check grammar
-    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-        if (document.getElementById('grammar-checker').classList.contains('active')) {
-            event.preventDefault();
-            checkGrammar();
-        }
-    }
-    
-    // Escape to clear results
-    if (event.key === 'Escape') {
-        if (document.getElementById('grammar-checker').classList.contains('active')) {
-            clearText();
-        }
-    }
 });
 
 // Add real-time character count (optional)
@@ -545,417 +593,14 @@ document.addEventListener('DOMContentLoaded', function() {
     continueButtons.forEach(button => {
         button.addEventListener('click', function() {
             const lessonTitle = this.parentElement.querySelector('.lesson-title').textContent;
+            console.log(`Continue learning: ${lessonTitle}`);
+            // Add navigation logic here
         });
     });
 });
 
-// ==========================================
-//          SCRAMBIFY GAME
-// ==========================================
-
-// Scramble game data
-const scrambleWords = {
-    easy: [
-        { word: "apple", hint: "A common red or green fruit" },
-        { word: "house", hint: "A place where people live" },
-        { word: "water", hint: "Clear liquid essential for life" },
-        { word: "happy", hint: "Feeling of joy or contentment" },
-        { word: "sunny", hint: "Bright with sunlight" },
-        { word: "green", hint: "The color of grass" },
-        { word: "music", hint: "Pleasant sounds in harmony" },
-        { word: "friend", hint: "Someone you care about" },
-        { word: "smile", hint: "Happy facial expression" },
-        { word: "peace", hint: "State of tranquility" },
-        { word: "heart", hint: "Organ that pumps blood" },
-        { word: "light", hint: "Brightness that lets us see" },
-        { word: "dream", hint: "Images during sleep" },
-        { word: "dance", hint: "Moving to music" },
-        { word: "ocean", hint: "Large body of salt water" }
-    ],
-    medium: [
-        { word: "computer", hint: "Electronic device for processing data" },
-        { word: "elephant", hint: "Large grey animal with trunk" },
-        { word: "rainbow", hint: "Arc of colors in the sky" },
-        { word: "butterfly", hint: "Colorful flying insect" },
-        { word: "mountain", hint: "Very high natural elevation" },
-        { word: "adventure", hint: "Exciting or unusual experience" },
-        { word: "chocolate", hint: "Sweet brown confection" },
-        { word: "telephone", hint: "Device for voice communication" },
-        { word: "vacation", hint: "Time away from work or school" },
-        { word: "dinosaur", hint: "Extinct prehistoric reptile" },
-        { word: "keyboard", hint: "Input device with keys" },
-        { word: "sandwich", hint: "Food between bread slices" },
-        { word: "umbrella", hint: "Protection from rain" },
-        { word: "fountain", hint: "Decorative water feature" },
-        { word: "calendar", hint: "Chart showing days and dates" }
-    ],
-    hard: [
-        { word: "programming", hint: "Writing code for computers" },
-        { word: "magnificent", hint: "Extremely beautiful or impressive" },
-        { word: "constellation", hint: "Group of stars forming a pattern" },
-        { word: "architecture", hint: "Art of designing buildings" },
-        { word: "photography", hint: "Art of taking pictures" },
-        { word: "encyclopedia", hint: "Reference work with articles" },
-        { word: "Mediterranean", hint: "Sea between Europe and Africa" },
-        { word: "sophisticated", hint: "Highly developed or complex" },
-        { word: "documentary", hint: "Non-fiction film or program" },
-        { word: "extraordinary", hint: "Very unusual or remarkable" },
-        { word: "revolutionary", hint: "Involving major change" },
-        { word: "unbelievable", hint: "Hard to believe" },
-        { word: "entrepreneurship", hint: "Starting and running businesses" },
-        { word: "philosophical", hint: "Relating to philosophy" },
-        { word: "sustainability", hint: "Ability to maintain over time" }
-    ]
-};
-
-let currentScrambleGame = {
-    level: '',
-    currentWord: null,
-    score: 0,
-    wordsCompleted: 0
-};
-
-// Start Scrambify game
-function startScrambify(level) {
-    currentScrambleGame.level = level;
-    currentScrambleGame.score = 0;
-    currentScrambleGame.wordsCompleted = 0;
-    
-    document.getElementById('scrambify-menu').style.display = 'none';
-    document.getElementById('scrambify-game').style.display = 'block';
-    document.getElementById('current-level').textContent = level.charAt(0).toUpperCase() + level.slice(1);
-    document.getElementById('scramble-score').textContent = '0';
-    
-    loadNewScrambleWord();
-}
-
-// Back to Scrambify menu
-function backToScrambifyMenu() {
-    document.getElementById('scrambify-menu').style.display = 'block';
-    document.getElementById('scrambify-game').style.display = 'none';
-    clearScrambleFeedback();
-}
-
-// Load new scramble word
-function loadNewScrambleWord() {
-    const words = scrambleWords[currentScrambleGame.level];
-    const randomWord = words[Math.floor(Math.random() * words.length)];
-    currentScrambleGame.currentWord = randomWord;
-    
-    displayScrambledWord(randomWord.word);
-    clearScrambleFeedback();
-    hideScrambleHint();
-    
-    document.getElementById('check-answer').style.display = 'inline-block';
-    document.getElementById('next-word').style.display = 'none';
-}
-
-// Display scrambled word
-function displayScrambledWord(word) {
-    const container = document.getElementById('scrambled-letters');
-    container.innerHTML = '';
-    
-    const letters = word.split('').sort(() => Math.random() - 0.5);
-    
-    letters.forEach(letter => {
-        const letterTile = document.createElement('div');
-        letterTile.classList.add('letter-tile');
-        letterTile.textContent = letter.toUpperCase();
-        letterTile.draggable = true;
-        
-        // Add drag event listeners
-        letterTile.addEventListener('dragstart', handleDragStart);
-        letterTile.addEventListener('dragend', handleDragEnd);
-        letterTile.addEventListener('dragover', handleDragOver);
-        letterTile.addEventListener('drop', handleDrop);
-        
-        container.appendChild(letterTile);
-    });
-}
-
-// Drag and drop handlers
-let draggedElement = null;
-
-function handleDragStart(e) {
-    draggedElement = e.target;
-    e.target.classList.add('dragging');
-}
-
-function handleDragEnd(e) {
-    e.target.classList.remove('dragging');
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    
-    if (draggedElement && e.target.classList.contains('letter-tile') && e.target !== draggedElement) {
-        const container = e.target.parentNode;
-        const draggedIndex = Array.from(container.children).indexOf(draggedElement);
-        const targetIndex = Array.from(container.children).indexOf(e.target);
-        
-        if (draggedIndex < targetIndex) {
-            container.insertBefore(draggedElement, e.target.nextSibling);
-        } else {
-            container.insertBefore(draggedElement, e.target);
-        }
-    }
-}
-
-// Check scramble answer
-function checkScrambleAnswer() {
-    const container = document.getElementById('scrambled-letters');
-    const letters = Array.from(container.children).map(tile => tile.textContent.toLowerCase()).join('');
-    const correctWord = currentScrambleGame.currentWord.word;
-    
-    if (letters === correctWord) {
-        showScrambleFeedback('Correct! Well done! 🎉', 'success');
-        currentScrambleGame.score += getScoreForLevel(currentScrambleGame.level);
-        currentScrambleGame.wordsCompleted++;
-        document.getElementById('scramble-score').textContent = currentScrambleGame.score;
-        
-        document.getElementById('check-answer').style.display = 'none';
-        document.getElementById('next-word').style.display = 'inline-block';
-    } else {
-        showScrambleFeedback('Not quite right. Try again! 🤔', 'error');
-    }
-}
-
-// Get score for level
-function getScoreForLevel(level) {
-    switch (level) {
-        case 'easy': return 10;
-        case 'medium': return 20;
-        case 'hard': return 30;
-        default: return 10;
-    }
-}
-
-// Show scramble hint
-function showScrambleHint() {
-    const hintDisplay = document.getElementById('scramble-hint');
-    hintDisplay.textContent = `💡 Hint: ${currentScrambleGame.currentWord.hint}`;
-    hintDisplay.classList.add('show');
-}
-
-// Hide scramble hint
-function hideScrambleHint() {
-    const hintDisplay = document.getElementById('scramble-hint');
-    hintDisplay.classList.remove('show');
-}
-
-// Next scramble word
-function nextScrambleWord() {
-    loadNewScrambleWord();
-}
-
-// Show scramble feedback
-function showScrambleFeedback(message, type) {
-    const feedback = document.getElementById('scramble-feedback');
-    feedback.textContent = message;
-    feedback.className = `game-feedback ${type}`;
-}
-
-// Clear scramble feedback
-function clearScrambleFeedback() {
-    const feedback = document.getElementById('scramble-feedback');
-    feedback.textContent = '';
-    feedback.className = 'game-feedback';
-}
-
-// ==========================================
-//          memorybo GAME
-// ==========================================
-
-// Memory game data
-const memoryWords = [
-    { word: 'rain', meaning: 'Water that falls from the sky' },
-    { word: 'mountain', meaning: 'A large natural elevation of the earth\'s surface' },
-    { word: 'ocean', meaning: 'A vast body of saltwater' },
-    { word: 'forest', meaning: 'A large area covered with trees' },
-    { word: 'desert', meaning: 'A dry barren area of land' },
-    { word: 'river', meaning: 'A large natural stream of water' },
-    { word: 'island', meaning: 'A piece of land surrounded by water' },
-    { word: 'bridge', meaning: 'A structure that allows passage over an obstacle' },
-    { word: 'castle', meaning: 'A large fortified building' },
-    { word: 'library', meaning: 'A building containing books for reading' },
-    { word: 'garden', meaning: 'A plot of ground for growing plants' },
-    { word: 'market', meaning: 'A place where goods are sold' },
-    { word: 'hospital', meaning: 'A place for medical treatment' },
-    { word: 'school', meaning: 'An institution for education' },
-    { word: 'theater', meaning: 'A building for dramatic performances' }
-];
-
-let currentMemoryGame = {
-    cards: [],
-    flippedCards: [],
-    matchedPairs: 0,
-    attempts: 0,
-    totalPairs: 6
-};
-
-// Start memorybo game
-function startmemorybo() {
-    document.getElementById('memorybo-menu').style.display = 'none';
-    document.getElementById('memorybo-game').style.display = 'block';
-    
-    initializeMemoryGame();
-}
-
-// Back to memorybo menu
-function backTomemoryboMenu() {
-    document.getElementById('memorybo-menu').style.display = 'block';
-    document.getElementById('memorybo-game').style.display = 'none';
-}
-
-// Initialize memory game
-function initializeMemoryGame() {
-    currentMemoryGame.flippedCards = [];
-    currentMemoryGame.matchedPairs = 0;
-    currentMemoryGame.attempts = 0;
-    
-    // Select random word pairs
-    const selectedWords = memoryWords.sort(() => 0.5 - Math.random()).slice(0, 6);
-    
-    // Create card pairs
-    currentMemoryGame.cards = [];
-    selectedWords.forEach((wordPair, index) => {
-        currentMemoryGame.cards.push({
-            id: `word-${index}`,
-            content: wordPair.word,
-            type: 'word',
-            pairId: index
-        });
-        currentMemoryGame.cards.push({
-            id: `meaning-${index}`,
-            content: wordPair.meaning,
-            type: 'meaning',
-            pairId: index
-        });
-    });
-    
-    // Shuffle cards
-    currentMemoryGame.cards = currentMemoryGame.cards.sort(() => 0.5 - Math.random());
-    
-    updateMemoryUI();
-    renderMemoryBoard();
-}
-
-// Render memory board
-function renderMemoryBoard() {
-    const board = document.getElementById('memory-board');
-    board.innerHTML = '';
-    
-    currentMemoryGame.cards.forEach((card, index) => {
-        const cardElement = document.createElement('div');
-        cardElement.classList.add('memory-card');
-        cardElement.dataset.cardIndex = index;
-        cardElement.dataset.pairId = card.pairId;
-        cardElement.dataset.type = card.type;
-        cardElement.textContent = '?';
-        
-        cardElement.addEventListener('click', flipMemoryCard);
-        
-        board.appendChild(cardElement);
-    });
-}
-
-// Flip memory card
-function flipMemoryCard(e) {
-    const card = e.target;
-    const cardIndex = parseInt(card.dataset.cardIndex);
-    
-    // Don't allow flipping if card is already flipped or matched, or if two cards are already flipped
-    if (card.classList.contains('flipped') || 
-        card.classList.contains('matched') || 
-        currentMemoryGame.flippedCards.length >= 2) {
-        return;
-    }
-    
-    // Flip the card
-    card.classList.add('flipped');
-    card.textContent = currentMemoryGame.cards[cardIndex].content;
-    currentMemoryGame.flippedCards.push(cardIndex);
-    
-    // Check for match when two cards are flipped
-    if (currentMemoryGame.flippedCards.length === 2) {
-        setTimeout(checkMemoryMatch, 1000);
-    }
-}
-
-// Check for memory match
-function checkMemoryMatch() {
-    const [firstIndex, secondIndex] = currentMemoryGame.flippedCards;
-    const firstCard = document.querySelector(`[data-card-index="${firstIndex}"]`);
-    const secondCard = document.querySelector(`[data-card-index="${secondIndex}"]`);
-    
-    const firstPairId = currentMemoryGame.cards[firstIndex].pairId;
-    const secondPairId = currentMemoryGame.cards[secondIndex].pairId;
-    
-    currentMemoryGame.attempts++;
-    
-    if (firstPairId === secondPairId) {
-        // Match found
-        firstCard.classList.add('matched');
-        secondCard.classList.add('matched');
-        currentMemoryGame.matchedPairs++;
-        
-        showMemoryFeedback('Great match! 🎉', 'success');
-        
-        // Check if game is complete
-        if (currentMemoryGame.matchedPairs === currentMemoryGame.totalPairs) {
-            setTimeout(() => {
-                showMemoryFeedback(`Congratulations! You completed the game in ${currentMemoryGame.attempts} attempts! 🏆`, 'success');
-            }, 500);
-        }
-    } else {
-        // No match
-        setTimeout(() => {
-            firstCard.classList.remove('flipped');
-            secondCard.classList.remove('flipped');
-            firstCard.textContent = '?';
-            secondCard.textContent = '?';
-        }, 500);
-        
-        showMemoryFeedback('No match. Try again! 🤔', 'info');
-    }
-    
-    currentMemoryGame.flippedCards = [];
-    updateMemoryUI();
-}
-
-// Update memory UI
-function updateMemoryUI() {
-    document.getElementById('matches-found').textContent = currentMemoryGame.matchedPairs;
-    document.getElementById('total-matches').textContent = currentMemoryGame.totalPairs;
-    document.getElementById('attempts-count').textContent = currentMemoryGame.attempts;
-}
-
-// Reset memory game
-function resetMemoryGame() {
-    initializeMemoryGame();
-    clearMemoryFeedback();
-}
-
-// Show memory feedback
-function showMemoryFeedback(message, type) {
-    const feedback = document.getElementById('memory-feedback');
-    feedback.textContent = message;
-    feedback.className = `game-feedback ${type}`;
-    
-    setTimeout(() => {
-        if (type !== 'success' || !message.includes('Congratulations')) {
-            clearMemoryFeedback();
-        }
-    }, 2000);
-}
-
-// Clear memory feedback
-function clearMemoryFeedback() {
-    const feedback = document.getElementById('memory-feedback');
-    feedback.textContent = '';
-    feedback.className = 'game-feedback';
-}
+// Make functions globally available for onclick handlers
+window.navigateToLessons = navigateToLessons;
+window.showSettings = showSettings;
+window.showHelp = showHelp;
+window.signOutFromDropdown = signOutFromDropdown;
