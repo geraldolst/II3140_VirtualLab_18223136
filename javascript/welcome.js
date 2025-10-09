@@ -106,7 +106,7 @@ function startLearning() {
         continueBtn.style.transform = 'scale(1)';
         
         // Navigate to login page
-        window.location.href = '../html/login.html';
+        window.location.href = 'login.html';
     }, 150);
 }
 
