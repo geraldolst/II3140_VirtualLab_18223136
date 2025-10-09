@@ -1,21 +1,65 @@
-// Welcome Page JavaScript
+// Check if we're in a module environment (for Supabase import)
+let supabase;
 
-// Loading Animation Variables
-let loadingProgress = 0;
-let loadingInterval;
-const loadingDuration = 3000; // 3 seconds
-const loadingSteps = 100;
+// Initialize Supabase client
+async function initializeSupabase() {
+    try {
+        // Import Supabase dynamically
+        const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js');
+        
+        //Environment variables
+        const supabaseUrl = 'YOUR_SUPABASE_URL'; 
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; 
+        
+        supabase = createClient(supabaseUrl, supabaseKey);
+        return supabase;
+    } catch (error) {
+        console.error('Failed to initialize Supabase:', error);
+        // Fallback to localStorage-based auth
+        return null;
+    }
+}
 
 // DOM Elements
-const loadingScreen = document.getElementById('loadingScreen');
-const welcomeContent = document.getElementById('welcomeContent');
-const loadingProgressBar = document.querySelector('.loading-progress');
-const loadingPercentage = document.querySelector('.loading-percentage');
+const registerForm = document.getElementById('registerForm');
+const fullNameInput = document.getElementById('fullName');
+const registerEmailInput = document.getElementById('registerEmail');
+const registerPasswordInput = document.getElementById('registerPassword');
+const confirmPasswordInput = document.getElementById('confirmPassword');
+const agreeTermsCheckbox = document.getElementById('agreeTerms');
 
-// Initialize loading when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    startLoading();
+// Initialize register page
+document.addEventListener('DOMContentLoaded', async function() {
+    await initializeSupabase();
+    await checkExistingAuth();
+    initializeRegisterForm();
+    initializePasswordToggle();
 });
+
+// Check if user is already logged in
+async function checkExistingAuth() {
+    if (supabase) {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                // Redirect to dashboard if already logged in
+                window.location.href = 'dashboard.html';
+                return;
+            }
+        } catch (error) {
+            console.error('Error checking auth:', error);
+        }
+    }
+    
+    // Fallback: check localStorage
+    const userData = localStorage.getItem('bobolingoUser');
+    if (userData) {
+        const user = JSON.parse(userData);
+        if (user.isLoggedIn) {
+            window.location.href = 'dashboard.html';
+        }
+    }
+}
 
 // Start Loading Animation
 function startLoading() {
@@ -106,7 +150,7 @@ function startLearning() {
         continueBtn.style.transform = 'scale(1)';
         
         // Navigate to login page
-        window.location.href = 'login.html';
+        window.location.href = '../html/login.html';
     }, 150);
 }
 
