@@ -7,9 +7,9 @@ async function initializeSupabase() {
         // Import Supabase dynamically
         const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js');
         
-        //Environment variables
-        const supabaseUrl = 'YOUR_SUPABASE_URL'; 
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; 
+        //Environment variables (for production, use actual env vars)
+        const supabaseUrl = 'https://inlksxdnfiruqaiumofw.supabase.co'; 
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlubGtzeGRuZmlydXFhaXVtb2Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMjg0NTIsImV4cCI6MjA3NTYwNDQ1Mn0.35KjPxnqPSJD5PcNJiOinrDu2RlG3rPUDKdre3dSxXU'; 
         
         supabase = createClient(supabaseUrl, supabaseKey);
         return supabase;
@@ -28,12 +28,29 @@ const registerPasswordInput = document.getElementById('registerPassword');
 const confirmPasswordInput = document.getElementById('confirmPassword');
 const agreeTermsCheckbox = document.getElementById('agreeTerms');
 
+// Loading Animation Elements
+const loadingScreen = document.getElementById('loadingScreen');
+const loadingProgressBar = document.querySelector('.loading-progress');
+const loadingPercentage = document.querySelector('.loading-percentage');
+const welcomeContent = document.querySelector('.welcome-content');
+
+// Loading Animation Variables
+let loadingProgress = 0;
+let loadingInterval;
+const loadingDuration = 3000; // 3 seconds
+const loadingSteps = 100;
+
 // Initialize register page
 document.addEventListener('DOMContentLoaded', async function() {
     await initializeSupabase();
     await checkExistingAuth();
     initializeRegisterForm();
     initializePasswordToggle();
+    
+    // Start loading animation if loading screen exists
+    if (loadingScreen) {
+        startLoading();
+    }
 });
 
 // Check if user is already logged in
@@ -60,6 +77,299 @@ async function checkExistingAuth() {
         }
     }
 }
+
+// Initialize register form
+function initializeRegisterForm() {
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleRegister();
+        });
+    }
+}
+
+// Initialize password toggle
+function initializePasswordToggle() {
+    const passwordToggle = document.querySelector('.password-toggle');
+    if (passwordToggle) {
+        passwordToggle.addEventListener('click', toggleRegisterPassword);
+    }
+}
+
+// Handle register submission
+async function handleRegister() {
+    // Get form data
+    const formData = {
+        fullName: fullNameInput ? fullNameInput.value.trim() : '',
+        email: registerEmailInput ? registerEmailInput.value.trim() : '',
+        password: registerPasswordInput ? registerPasswordInput.value : '',
+        confirmPassword: confirmPasswordInput ? confirmPasswordInput.value : '',
+        agreeTerms: agreeTermsCheckbox ? agreeTermsCheckbox.checked : false
+    };
+
+    // Basic validation
+    if (!validateRegisterForm(formData)) {
+        return;
+    }
+
+    // Show loading state
+    showRegisterLoadingState();
+
+    if (supabase) {
+        // Use Supabase authentication
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+                options: {
+                    data: {
+                        full_name: formData.fullName,
+                        display_name: formData.fullName
+                    }
+                }
+            });
+
+            if (error) {
+                showRegisterError(error.message);
+                resetRegisterButton();
+                return;
+            }
+
+            // Show success message
+            showRegisterSuccessMessage();
+
+            // Save additional data to localStorage for compatibility
+            const userData = {
+                name: formData.fullName,
+                email: formData.email,
+                isLoggedIn: true,
+                loginDate: new Date().toISOString(),
+                loginMethod: 'email',
+                supabaseUser: true,
+                isNewUser: true
+            };
+            localStorage.setItem('bobolingoUser', JSON.stringify(userData));
+
+            // Redirect to dashboard after delay
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
+
+        } catch (error) {
+            console.error('Registration error:', error);
+            showRegisterError('An unexpected error occurred. Please try again.');
+            resetRegisterButton();
+        }
+    } else {
+        // Fallback to localStorage-based registration
+        setTimeout(() => {
+            const userData = {
+                name: formData.fullName,
+                email: formData.email,
+                isLoggedIn: true,
+                loginDate: new Date().toISOString(),
+                loginMethod: 'email',
+                isNewUser: true
+            };
+
+            localStorage.setItem('bobolingoUser', JSON.stringify(userData));
+            showRegisterSuccessMessage();
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
+        }, 2000);
+    }
+}
+
+// Validate register form
+function validateRegisterForm(formData) {
+    // Check if all required fields are filled
+    if (!formData.fullName || !formData.email || !formData.password || !formData.confirmPassword) {
+        showRegisterError('Please fill in all required fields.');
+        return false;
+    }
+
+    // Check if passwords match
+    if (formData.password !== formData.confirmPassword) {
+        showRegisterError('Passwords do not match.');
+        return false;
+    }
+
+    // Check if terms are agreed
+    if (!formData.agreeTerms) {
+        showRegisterError('Please agree to the Terms & Conditions.');
+        return false;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+        showRegisterError('Please enter a valid email address.');
+        return false;
+    }
+
+    // Basic password validation
+    if (formData.password.length < 6) {
+        showRegisterError('Password must be at least 6 characters long.');
+        return false;
+    }
+
+    return true;
+}
+
+// Show register loading state
+function showRegisterLoadingState() {
+    const registerBtn = document.querySelector('.register-btn');
+    if (registerBtn) {
+        registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+        registerBtn.disabled = true;
+    }
+}
+
+// Show register success message
+function showRegisterSuccessMessage() {
+    const registerBtn = document.querySelector('.register-btn');
+    if (registerBtn) {
+        registerBtn.innerHTML = '<i class="fas fa-check"></i> Account Created!';
+        registerBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    }
+}
+
+// Reset register button
+function resetRegisterButton() {
+    const registerBtn = document.querySelector('.register-btn');
+    if (registerBtn) {
+        registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+        registerBtn.disabled = false;
+        registerBtn.style.background = '';
+    }
+}
+
+// Show register error
+function showRegisterError(message) {
+    let errorElement = document.querySelector('.register-error');
+    
+    if (!errorElement) {
+        errorElement = document.createElement('div');
+        errorElement.className = 'register-error';
+        errorElement.style.cssText = `
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #fecaca;
+            font-size: 0.9rem;
+            animation: slideDown 0.3s ease;
+        `;
+        
+        const registerForm = document.querySelector('.register-form');
+        if (registerForm) {
+            registerForm.insertBefore(errorElement, registerForm.firstChild);
+        }
+    }
+    
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    
+    // Hide error after 5 seconds
+    setTimeout(() => {
+        if (errorElement) {
+            errorElement.style.display = 'none';
+        }
+    }, 5000);
+}
+
+// Toggle register password visibility
+function toggleRegisterPassword() {
+    const passwordInput = document.getElementById('registerPassword');
+    const passwordIcon = document.getElementById('registerPasswordIcon');
+    
+    if (passwordInput && passwordIcon) {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordIcon.classList.remove('fa-eye');
+            passwordIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            passwordIcon.classList.remove('fa-eye-slash');
+            passwordIcon.classList.add('fa-eye');
+        }
+    }
+}
+
+// Google Sign-up with Supabase OAuth
+async function signUpWithGoogle() {
+    const googleBtn = document.querySelector('.google-btn');
+    if (!googleBtn) return;
+    
+    const originalContent = googleBtn.innerHTML;
+    
+    // Show loading state
+    googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing up with Google...';
+    googleBtn.disabled = true;
+
+    if (supabase) {
+        try {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/auth-callback.html`,
+                    queryParams: {
+                        prompt: 'select_account'
+                    }
+                }
+            });
+
+            if (error) {
+                console.error('Google sign-up error:', error);
+                showRegisterError('Failed to sign up with Google. Please try again.');
+                
+                // Reset button
+                googleBtn.innerHTML = originalContent;
+                googleBtn.disabled = false;
+                return;
+            }
+
+            // If successful, user will be redirected automatically
+
+        } catch (error) {
+            console.error('Google OAuth error:', error);
+            showRegisterError('An unexpected error occurred with Google sign-up.');
+            
+            // Reset button
+            googleBtn.innerHTML = originalContent;
+            googleBtn.disabled = false;
+        }
+    } else {
+        // Fallback simulation for development
+        setTimeout(() => {
+            const userData = {
+                name: 'Google User',
+                email: 'user@gmail.com',
+                isLoggedIn: true,
+                loginDate: new Date().toISOString(),
+                loginMethod: 'google',
+                profilePicture: 'https://via.placeholder.com/150',
+                isNewUser: true
+            };
+
+            localStorage.setItem('bobolingoUser', JSON.stringify(userData));
+
+            googleBtn.innerHTML = '<i class="fas fa-check"></i> Success!';
+            googleBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }, 2000);
+    }
+}
+
+// Make functions globally available
+window.signUpWithGoogle = signUpWithGoogle;
+window.toggleRegisterPassword = toggleRegisterPassword;
 
 // Start Loading Animation
 function startLoading() {

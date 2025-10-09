@@ -9,9 +9,9 @@ async function initializeSupabase() {
         // Import Supabase dynamically
         const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js');
         
-        // Get environment variables (you'll need to set these)
-        const supabaseUrl = 'YOUR_SUPABASE_URL'; // Replace with your actual URL
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your actual key
+        // Get environment variables
+        const supabaseUrl = 'https://inlksxdnfiruqaiumofw.supabase.co'; 
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlubGtzeGRuZmlydXFhaXVtb2Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMjg0NTIsImV4cCI6MjA3NTYwNDQ1Mn0.35KjPxnqPSJD5PcNJiOinrDu2RlG3rPUDKdre3dSxXU';
         
         supabase = createClient(supabaseUrl, supabaseKey);
         return supabase;
@@ -247,7 +247,10 @@ async function signInWithGoogle() {
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}/dashboard.html`
+                    redirectTo: `${window.location.origin}/auth-callback.html`,
+                    queryParams: {
+                        prompt: 'select_account'
+                    }
                 }
             });
 
