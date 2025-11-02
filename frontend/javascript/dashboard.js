@@ -10,8 +10,8 @@ const grammarResults = document.getElementById('grammarResults');
 const grammarLanguage = document.getElementById('grammarLanguage');
 
 // Initialize dashboard
-document.addEventListener('DOMContentLoaded', function() {
-    checkAuthAndLoadUser();
+document.addEventListener('DOMContentLoaded', async function() {
+    await checkAuthAndLoadUser();
     initializeNavigation();
     initializeGrammarChecker();
     animateStats();
@@ -19,25 +19,33 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Check authentication and load user data
-function checkAuthAndLoadUser() {
-    const userData = localStorage.getItem('bobolingoUser');
+async function checkAuthAndLoadUser() {
+    const token = localStorage.getItem('token');
     
-    if (!userData) {
-        // User not logged in, load as guest
-        loadGuestMode();
+    if (!token) {
+        // No token, redirect to login
+        window.location.href = 'login.html';
         return;
     }
     
-    const user = JSON.parse(userData);
-    
-    if (!user.isLoggedIn) {
-        // User not logged in, load as guest
-        loadGuestMode();
-        return;
+    try {
+        // Verify token with backend
+        const result = await window.API.auth.verifyToken();
+        
+        if (result.success && result.data && result.data.user) {
+            // Load user data
+            loadUserData(result.data.user);
+        } else {
+            // Invalid token
+            throw new Error('Invalid session');
+        }
+    } catch (error) {
+        console.error('Auth check error:', error);
+        // Clear invalid token and redirect
+        localStorage.removeItem('token');
+        window.API.clearUserData();
+        window.location.href = 'login.html';
     }
-    
-    // Load user data into dashboard
-    loadUserData(user);
 }
 
 // Load guest mode
@@ -65,18 +73,20 @@ function loadUserData(user) {
     const userInitialElement = document.querySelector('.avatar-letter');
     const welcomeTitle = document.querySelector('.section-title');
     
+    // Use username or extract from email
+    const displayName = user.username || user.email.split('@')[0];
+    const initial = displayName.charAt(0).toUpperCase();
+    
     if (userNameElement) {
-        const firstName = user.name.split(' ')[0];
-        userNameElement.textContent = firstName;
+        userNameElement.textContent = displayName;
     }
     
     if (userInitialElement) {
-        userInitialElement.textContent = user.name.charAt(0).toUpperCase();
+        userInitialElement.textContent = initial;
     }
     
     if (welcomeTitle) {
-        const firstName = user.name.split(' ')[0];
-        welcomeTitle.textContent = `Welcome back, ${firstName}! 🎉`;
+        welcomeTitle.textContent = `Welcome back, ${displayName}! 🎉`;
     }
 }
 
