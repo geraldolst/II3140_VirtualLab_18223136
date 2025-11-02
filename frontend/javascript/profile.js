@@ -26,9 +26,9 @@ function checkAuthAndLoadProfile() {
         // User not logged in, give option to login
         const wantsToLogin = confirm('You need to log in to access your profile.\n\nWould you like to go to the login page?');
         if (wantsToLogin) {
-            window.location.href = '../html/login.html';
+            window.location.href = 'login.html';
         } else {
-            window.location.href = '../html/dashboard.html';
+            window.location.href = 'dashboard.html';
         }
         return;
     }
@@ -39,9 +39,9 @@ function checkAuthAndLoadProfile() {
         // User not logged in, give option to login
         const wantsToLogin = confirm('You need to log in to access your profile.\n\nWould you like to go to the login page?');
         if (wantsToLogin) {
-            window.location.href = '../html/login.html';
+            window.location.href = 'login.html';
         } else {
-            window.location.href = '../html/dashboard.html';
+            window.location.href = 'dashboard.html';
         }
         return;
     }
@@ -321,7 +321,7 @@ function signOut() {
             localStorage.removeItem('bobolingoProfile');
             
             // Redirect to home page
-            window.location.href = '../html/index.html';
+            window.location.href = 'index.html';
         }, 1000);
     }
 }

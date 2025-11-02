@@ -136,11 +136,11 @@ function createUserDropdown() {
             </div>
             <div class="dropdown-divider"></div>
             <div class="dropdown-menu">
-                <a href="../html/login.html" class="dropdown-item">
+                <a href="login.html" class="dropdown-item">
                     <i class="fas fa-sign-in-alt"></i>
                     <span>Sign In</span>
                 </a>
-                <a href="../html/welcome.html" class="dropdown-item">
+                <a href="welcome.html" class="dropdown-item">
                     <i class="fas fa-user-plus"></i>
                     <span>Sign Up</span>
                 </a>
@@ -166,7 +166,7 @@ function createUserDropdown() {
             </div>
             <div class="dropdown-divider"></div>
             <div class="dropdown-menu">
-                <a href="../html/profile.html" class="dropdown-item">
+                <a href="profile.html" class="dropdown-item">
                     <i class="fas fa-user"></i>
                     <span>Profile</span>
                 </a>
@@ -340,7 +340,7 @@ function signOutFromDropdown() {
         localStorage.removeItem('bobolingoProfile');
         
         // Redirect to home page
-        window.location.href = '../html/index.html';
+        window.location.href = 'index.html';
     }
 }
 

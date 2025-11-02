@@ -105,8 +105,8 @@ function startLearning() {
     setTimeout(() => {
         continueBtn.style.transform = 'scale(1)';
         
-        // Navigate to login page
-        window.location.href = '../html/login.html';
+        // Navigate to login page (same directory)
+        window.location.href = 'login.html';
     }, 150);
 }
 

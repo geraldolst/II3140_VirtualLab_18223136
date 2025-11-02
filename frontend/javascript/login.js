@@ -56,7 +56,7 @@ function handleLogin() {
 
         // Redirect to dashboard after short delay
         setTimeout(() => {
-            window.location.href = '../html/dashboard.html';
+            window.location.href = 'dashboard.html';
         }, 1500);
 
     }, 2000); // 2 second delay to show loading
@@ -175,7 +175,7 @@ function initializePasswordToggle() {
     if (signupLink) {
         signupLink.addEventListener('click', function(e) {
             e.preventDefault();
-            window.location.href = '../html/welcome.html';
+            window.location.href = 'welcome.html';
         });
     }
 
@@ -233,5 +233,5 @@ function loginAsGuest() {
     localStorage.setItem('bobolingoUser', JSON.stringify(guestData));
 
     // Redirect to dashboard
-    window.location.href = '../html/dashboard.html';
+    window.location.href = 'dashboard.html';
 }
