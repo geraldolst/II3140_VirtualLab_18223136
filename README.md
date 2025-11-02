@@ -1,49 +1,176 @@
-# 🎓 Bobolingo - Interactive English Learning Platform
+# 🎓 Bobolingo - Language Learning Platform
+
+Platform pembelajaran bahasa yang menyenangkan dengan gamifikasi dan fitur interaktif.
 
 **Virtual Lab Project for ITB First Year Students**  
 *Interactive platform to support English courses with engaging features and games*
 
-![Snoopy Logo](assets/Snoopy-face-preview.png)
+![Snoopy Logo](frontend/assets/Snoopy-face-preview.png)
 
 ## 🌟 **Live Demo**
-**🚀 Website:** [https://https://bobolingolab.vercel.app/](https://bobolingolab.vercel.app/)
+**🚀 Website:** [https://bobolingolab.vercel.app/](https://bobolingolab.vercel.app/)
+
+---
+
+## 📁 **Project Structure**
+
+```
+II3140_VirtualLab_18223136/
+├── 📁 frontend/              # Frontend application
+│   ├── assets/               # Images, icons, GIFs
+│   ├── styles/               # CSS files
+│   ├── javascript/           # Frontend JS
+│   ├── *.html                # HTML pages
+│   ├── vercel.json           # Vercel config
+│   └── README.md             # Frontend documentation
+│
+├── 📁 backend/               # Backend API server
+│   ├── src/
+│   │   ├── routes/           # API routes
+│   │   ├── controllers/      # Business logic
+│   │   ├── middleware/       # Custom middleware
+│   │   ├── services/         # External services
+│   │   ├── config/           # Configuration
+│   │   └── server.js         # Main server
+│   ├── package.json          # Backend dependencies
+│   ├── .env.example          # Environment template
+│   └── README.md             # Backend documentation
+│
+├── 📁 docs/                  # Documentation
+└── README.md                 # This file
+```
 
 ---
 
 ##  **Key Features**
 
-### 1. 📚 **YouTube-Based Video Courses**
-- **English Fundamentals Course**
-- Comprehensive video lessons covering basic English skills
+### 1. 🎮 **Interactive Games**
+- **Scrambobo**: Word scrambling puzzle with 3 difficulty levels
+- **Memoribo**: Memory card matching game untuk vocabulary building
 
+### 2. 📚 **Learning Features**
+- YouTube-based video courses
+- English fundamentals course
+- Grammar checker (AI-powered - coming soon)
 
-### 2. 🧠 **Memorybo Game** 
-- **Word Matching Memory Game**
-- Match English words with their meanings
+### 3. � **User Management**
+- Google OAuth authentication via Supabase
+- User profile with statistics
+- Progress tracking
+- Game history & leaderboard
 
-
-### 3. 🔤 **Scrambobo Game**
-- **Word Scrambling Puzzle**
-- Unscramble letters to form correct English words  
-
-### 4. ✅ **Grammar Checker**
-- **Real-time Grammar Analysis**: Check text for grammatical errors using AI API (future development)
+### 4. 🎨 **Modern UI/UX**
+- Responsive design (mobile-friendly)
+- Smooth animations
+- Duolingo-inspired purple theme
+- Clean & intuitive interface
 
 ---
 
-## **Authentication System**
+## 🚀 **Getting Started**
 
-### **Current Implementation:**
-- **Guest Access**: Full access to all features without login required
-- **Static Login Page**: Login interface available for future authentication
-- **User-friendly Navigation**: Easy access to login/signup options
-- **Profile Management**: Basic user profile structure in place
+### **Prerequisites**
+- Node.js 16+ (for backend)
+- Git
+- Supabase account (for authentication & database)
 
-### **Authentication Status:**
-- ⚠️ **Note**: Authentication is currently **static/frontend-only**
-- Users can access login page but no backend validation implemented yet
-- All features accessible as guest user for demonstration purposes
-- Future updates will include full user authentication system
+### **Installation**
+
+#### 1. Clone Repository
+```bash
+git clone https://github.com/geraldolst/II3140_VirtualLab_18223136.git
+cd II3140_VirtualLab_18223136
+```
+
+#### 2. Setup Backend
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Edit .env dengan credentials Supabase Anda
+npm run dev
+```
+Backend akan berjalan di `http://localhost:3000`
+
+#### 3. Setup Frontend
+```bash
+cd frontend
+# Open with Live Server di VS Code
+# atau
+python -m http.server 5500
+# atau
+npx serve
+```
+Frontend akan berjalan di `http://localhost:5500`
+
+---
+
+## 🔧 **Tech Stack**
+
+### Frontend
+- HTML5, CSS3, JavaScript (Vanilla)
+- Supabase Client (Authentication)
+- Responsive Design
+
+### Backend
+- Node.js + Express.js
+- Supabase (Database & Auth)
+- JWT for session management
+- RESTful API architecture
+
+### Deployment
+- **Frontend**: Vercel
+- **Backend**: Railway / Render
+- **Database**: Supabase
+
+---
+
+## 📡 **API Endpoints**
+
+### Authentication
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/logout` - Logout user
+
+### Users
+- `GET /api/users/profile` - Get user profile
+- `PUT /api/users/profile` - Update profile
+- `GET /api/users/stats` - Get user statistics
+
+### Games
+- `POST /api/games/save-score` - Save game score
+- `GET /api/games/leaderboard/:type` - Get leaderboard
+- `GET /api/games/history` - Get game history
+
+### Grammar
+- `POST /api/grammar/check` - Check grammar
+
+---
+
+## 🎯 **Features Status**
+
+### ✅ Implemented
+- [x] Landing page dengan hero section
+- [x] Dashboard dengan game selection
+- [x] Scrambobo game (3 levels)
+- [x] Memoribo game
+- [x] User profile display
+- [x] Backend API structure
+- [x] Supabase integration
+- [x] Responsive design
+
+### 🚧 In Progress
+- [ ] Full authentication implementation
+- [ ] Grammar checker API integration
+- [ ] Leaderboard UI
+- [ ] Achievements system
+
+### 📋 Planned
+- [ ] More games (Quizbo, Listenbo)
+- [ ] Social features (friends, challenges)
+- [ ] Mobile app (PWA)
+- [ ] Multi-language support
+- [ ] Dark mode
 
 ---
 
