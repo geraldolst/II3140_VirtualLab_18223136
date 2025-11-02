@@ -1,104 +1,161 @@
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('../services/supabase.service');
+const supabase = require('../config/supabase');
+const authMiddleware = require('../middleware/auth.middleware');
+const { STATUS, ERRORS } = require('../config/constants');
 
-/**
- * @route   GET /api/users/profile
- * @desc    Get user profile
- * @access  Private
- */
-router.get('/profile', async (req, res) => {
+// GET /api/users/profile - Get user profile
+router.get('/profile', authMiddleware, async (req, res) => {
     try {
-        // TODO: Add authentication middleware
-        const userId = req.query.userId; // Temporary - should come from auth token
-        
-        const { data, error } = await supabase
+        const userId = req.user.id;
+
+        const { data: user, error } = await supabase
             .from('users')
-            .select('*')
+            .select('id, email, username, created_at, last_login')
             .eq('id', userId)
             .single();
-        
-        if (error) throw error;
-        
-        res.json({
+
+        if (error || !user) {
+            return res.status(STATUS.NOT_FOUND).json({
+                success: false,
+                message: ERRORS.USER_NOT_FOUND
+            });
+        }
+
+        res.status(STATUS.OK).json({
             success: true,
-            user: data
+            data: { user }
         });
     } catch (error) {
-        res.status(500).json({
+        console.error('Get profile error:', error);
+        res.status(STATUS.SERVER_ERROR).json({
             success: false,
-            message: error.message
+            message: 'Failed to retrieve profile'
         });
     }
 });
 
-/**
- * @route   PUT /api/users/profile
- * @desc    Update user profile
- * @access  Private
- */
-router.put('/profile', async (req, res) => {
+// PUT /api/users/profile - Update user profile
+router.put('/profile', authMiddleware, async (req, res) => {
     try {
-        const userId = req.query.userId; // Temporary
-        const updates = req.body;
-        
-        const { data, error } = await supabase
+        const userId = req.user.id;
+        const { username } = req.body;
+
+        if (!username) {
+            return res.status(STATUS.BAD_REQUEST).json({
+                success: false,
+                message: 'Username is required'
+            });
+        }
+
+        const { data: updatedUser, error } = await supabase
             .from('users')
-            .update(updates)
+            .update({ username })
             .eq('id', userId)
-            .select()
+            .select('id, email, username, created_at, last_login')
             .single();
-        
-        if (error) throw error;
-        
-        res.json({
+
+        if (error) {
+            console.error('Update profile error:', error);
+            return res.status(STATUS.SERVER_ERROR).json({
+                success: false,
+                message: 'Failed to update profile'
+            });
+        }
+
+        res.status(STATUS.OK).json({
             success: true,
             message: 'Profile updated successfully',
-            user: data
+            data: { user: updatedUser }
         });
     } catch (error) {
-        res.status(500).json({
+        console.error('Update profile error:', error);
+        res.status(STATUS.SERVER_ERROR).json({
             success: false,
-            message: error.message
+            message: 'Failed to update profile'
         });
     }
 });
 
-/**
- * @route   GET /api/users/stats
- * @desc    Get user statistics
- * @access  Private
- */
-router.get('/stats', async (req, res) => {
+// GET /api/users/stats - Get user statistics
+router.get('/stats', authMiddleware, async (req, res) => {
     try {
-        const userId = req.query.userId;
-        
+        const userId = req.user.id;
+
         // Get game scores
         const { data: scores, error } = await supabase
             .from('game_scores')
             .select('*')
             .eq('user_id', userId);
-        
-        if (error) throw error;
-        
+
+        if (error) {
+            console.error('Get stats error:', error);
+            return res.status(STATUS.SERVER_ERROR).json({
+                success: false,
+                message: 'Failed to retrieve statistics'
+            });
+        }
+
         const stats = {
             totalGames: scores.length,
             scramboboGames: scores.filter(s => s.game_type === 'scrambobo').length,
             memoriboGames: scores.filter(s => s.game_type === 'memoribo').length,
             totalScore: scores.reduce((sum, s) => sum + (s.score || 0), 0),
             averageScore: scores.length > 0 
-                ? scores.reduce((sum, s) => sum + (s.score || 0), 0) / scores.length 
+                ? Math.round(scores.reduce((sum, s) => sum + (s.score || 0), 0) / scores.length) 
+                : 0,
+            highestScore: scores.length > 0 
+                ? Math.max(...scores.map(s => s.score || 0))
                 : 0
         };
-        
-        res.json({
+
+        res.status(STATUS.OK).json({
             success: true,
-            stats
+            data: { stats }
         });
     } catch (error) {
-        res.status(500).json({
+        console.error('Get stats error:', error);
+        res.status(STATUS.SERVER_ERROR).json({
             success: false,
-            message: error.message
+            message: 'Failed to retrieve statistics'
+        });
+    }
+});
+
+// DELETE /api/users/account - Delete user account
+router.delete('/account', authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Delete user's game scores first
+        await supabase
+            .from('game_scores')
+            .delete()
+            .eq('user_id', userId);
+
+        // Delete user account
+        const { error } = await supabase
+            .from('users')
+            .delete()
+            .eq('id', userId);
+
+        if (error) {
+            console.error('Delete account error:', error);
+            return res.status(STATUS.SERVER_ERROR).json({
+                success: false,
+                message: 'Failed to delete account'
+            });
+        }
+
+        res.status(STATUS.OK).json({
+            success: true,
+            message: 'Account deleted successfully'
+        });
+    } catch (error) {
+        console.error('Delete account error:', error);
+        res.status(STATUS.SERVER_ERROR).json({
+            success: false,
+            message: 'Failed to delete account'
         });
     }
 });

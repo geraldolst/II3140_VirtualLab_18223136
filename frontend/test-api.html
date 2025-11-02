@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Integration Test - Bobolingo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 10px 5px;
+        }
+
+        .status-badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .test-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-section h2 .emoji {
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .result-box.success {
+            border-color: #28a745;
+            background: #f1f9f3;
+        }
+
+        .result-box.error {
+            border-color: #dc3545;
+            background: #f9f1f2;
+        }
+
+        .loading {
+            display: none;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .user-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .user-info strong {
+            color: #667eea;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 API Integration Test</h1>
+        <p class="subtitle">Test koneksi Frontend ↔️ Backend Bobolingo</p>
+
+        <div id="connection-status"></div>
+
+        <!-- Health Check -->
+        <div class="test-section">
+            <h2><span class="emoji">🏥</span> Health Check</h2>
+            <button onclick="testHealth()">Test Health Endpoint</button>
+            <div id="health-result" class="result-box" style="display: none;"></div>
+        </div>
+
+        <!-- Authentication -->
+        <div class="test-section">
+            <h2><span class="emoji">🔐</span> Authentication</h2>
+            
+            <div class="grid-2">
+                <div>
+                    <h3>Register</h3>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="reg-email" placeholder="test@bobolingo.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" id="reg-username" placeholder="Test User">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="reg-password" placeholder="Password123">
+                    </div>
+                    <button onclick="testRegister()">Register</button>
+                </div>
+
+                <div>
+                    <h3>Login</h3>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="login-email" placeholder="test@bobolingo.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="login-password" placeholder="Password123">
+                    </div>
+                    <button onclick="testLogin()">Login</button>
+                    <button onclick="testLogout()">Logout</button>
+                </div>
+            </div>
+
+            <div id="auth-result" class="result-box" style="display: none;"></div>
+            <div id="user-info" class="user-info" style="display: none;"></div>
+        </div>
+
+        <!-- User APIs -->
+        <div class="test-section">
+            <h2><span class="emoji">👤</span> User APIs</h2>
+            <button onclick="testGetProfile()">Get Profile</button>
+            <button onclick="testGetStats()">Get Stats</button>
+            <div id="user-result" class="result-box" style="display: none;"></div>
+        </div>
+
+        <!-- Game APIs -->
+        <div class="test-section">
+            <h2><span class="emoji">🎮</span> Game APIs</h2>
+            <button onclick="testSaveScore('scrambobo')">Save Scrambobo Score</button>
+            <button onclick="testSaveScore('memoribo')">Save Memoribo Score</button>
+            <button onclick="testLeaderboard('scrambobo')">Get Scrambobo Leaderboard</button>
+            <button onclick="testLeaderboard('memoribo')">Get Memoribo Leaderboard</button>
+            <button onclick="testGameHistory()">Get Game History</button>
+            <div id="game-result" class="result-box" style="display: none;"></div>
+        </div>
+
+        <!-- Grammar API -->
+        <div class="test-section">
+            <h2><span class="emoji">📝</span> Grammar Check</h2>
+            <div class="form-group">
+                <label>Text to check:</label>
+                <input type="text" id="grammar-text" placeholder="This is a test sentence" value="This is a test sentence">
+            </div>
+            <button onclick="testGrammarCheck()">Check Grammar</button>
+            <div id="grammar-result" class="result-box" style="display: none;"></div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <script src="javascript/config.js"></script>
+    <script>
+        // Update user info display
+        function updateUserInfo() {
+            const userData = window.API.getUserData();
+            const userInfoDiv = document.getElementById('user-info');
+            
+            if (userData && userData.user) {
+                userInfoDiv.style.display = 'block';
+                userInfoDiv.innerHTML = `
+                    <strong>Logged in as:</strong> ${userData.user.email || userData.user.username}<br>
+                    <strong>User ID:</strong> ${userData.user.id}<br>
+                    <strong>Token:</strong> ${userData.token ? userData.token.substring(0, 30) + '...' : 'None'}
+                `;
+            } else {
+                userInfoDiv.style.display = 'none';
+            }
+        }
+
+        // Show result
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result-box ${isError ? 'error' : 'success'}`;
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Test Health
+        async function testHealth() {
+            try {
+                const response = await fetch('http://localhost:3000/health');
+                const data = await response.json();
+                showResult('health-result', data);
+                
+                updateConnectionStatus(true);
+            } catch (error) {
+                showResult('health-result', { error: error.message }, true);
+                updateConnectionStatus(false);
+            }
+        }
+
+        // Update connection status
+        function updateConnectionStatus(isConnected) {
+            const statusDiv = document.getElementById('connection-status');
+            if (isConnected) {
+                statusDiv.innerHTML = '<span class="status-badge success">✅ Backend Connected</span>';
+            } else {
+                statusDiv.innerHTML = '<span class="status-badge error">❌ Backend Disconnected</span>';
+            }
+        }
+
+        // Test Register
+        async function testRegister() {
+            const email = document.getElementById('reg-email').value;
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+
+            try {
+                const response = await window.API.auth.register(email, password, username);
+                showResult('auth-result', response);
+                updateUserInfo();
+            } catch (error) {
+                showResult('auth-result', { error: error.message }, true);
+            }
+        }
+
+        // Test Login
+        async function testLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await window.API.auth.login(email, password);
+                showResult('auth-result', response);
+                updateUserInfo();
+            } catch (error) {
+                showResult('auth-result', { error: error.message }, true);
+            }
+        }
+
+        // Test Logout
+        async function testLogout() {
+            try {
+                await window.API.auth.logout();
+                showResult('auth-result', { success: true, message: 'Logged out successfully' });
+                updateUserInfo();
+            } catch (error) {
+                showResult('auth-result', { error: error.message }, true);
+            }
+        }
+
+        // Test Get Profile
+        async function testGetProfile() {
+            try {
+                const response = await window.API.user.getProfile();
+                showResult('user-result', response);
+            } catch (error) {
+                showResult('user-result', { error: error.message }, true);
+            }
+        }
+
+        // Test Get Stats
+        async function testGetStats() {
+            try {
+                const response = await window.API.user.getStats();
+                showResult('user-result', response);
+            } catch (error) {
+                showResult('user-result', { error: error.message }, true);
+            }
+        }
+
+        // Test Save Score
+        async function testSaveScore(gameType) {
+            try {
+                const score = Math.floor(Math.random() * 100) + 50;
+                const response = await window.API.game.saveScore(
+                    gameType, 
+                    score, 
+                    'medium', 
+                    true
+                );
+                showResult('game-result', response);
+            } catch (error) {
+                showResult('game-result', { error: error.message }, true);
+            }
+        }
+
+        // Test Leaderboard
+        async function testLeaderboard(gameType) {
+            try {
+                const response = await window.API.game.getLeaderboard(gameType, 10);
+                showResult('game-result', response);
+            } catch (error) {
+                showResult('game-result', { error: error.message }, true);
+            }
+        }
+
+        // Test Game History
+        async function testGameHistory() {
+            try {
+                const response = await window.API.game.getHistory();
+                showResult('game-result', response);
+            } catch (error) {
+                showResult('game-result', { error: error.message }, true);
+            }
+        }
+
+        // Test Grammar Check
+        async function testGrammarCheck() {
+            const text = document.getElementById('grammar-text').value;
+            try {
+                const response = await window.API.grammar.check(text);
+                showResult('grammar-result', response);
+            } catch (error) {
+                showResult('grammar-result', { error: error.message }, true);
+            }
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Test page loaded');
+            updateUserInfo();
+            testHealth(); // Auto-test health on load
+        });
+    </script>
+</body>
+</html>

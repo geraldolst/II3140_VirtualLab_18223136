@@ -5,81 +5,94 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ==========================================
-// MIDDLEWARE
-// ==========================================
-
-// Enable CORS
+// Middleware
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5500',
     credentials: true
 }));
-
-// Parse JSON bodies
 app.use(express.json());
-
-// Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging middleware
+// Request logging
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
     next();
 });
 
-// ==========================================
-// ROUTES
-// ==========================================
-
-// Health check endpoint
+// Health check first (before routes that might fail)
 app.get('/health', (req, res) => {
     res.json({ 
         status: 'OK', 
         message: 'Bobolingo Backend API is running',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        version: '1.0.0'
     });
 });
 
-// API Routes
-app.use('/api/auth', require('./routes/auth.routes'));
-app.use('/api/users', require('./routes/user.routes'));
-app.use('/api/games', require('./routes/game.routes'));
-app.use('/api/grammar', require('./routes/grammar.routes'));
+// Routes - with error handling
+try {
+    app.use('/api/auth', require('./routes/auth.routes'));
+    console.log('✅ Auth routes loaded');
+} catch (error) {
+    console.error('❌ Error loading auth routes:', error.message);
+}
 
-// ==========================================
-// ERROR HANDLING
-// ==========================================
+try {
+    app.use('/api/users', require('./routes/user.routes'));
+    console.log('✅ User routes loaded');
+} catch (error) {
+    console.error('❌ Error loading user routes:', error.message);
+}
+
+try {
+    app.use('/api/games', require('./routes/game.routes'));
+    console.log('✅ Game routes loaded');
+} catch (error) {
+    console.error('❌ Error loading game routes:', error.message);
+}
+
+try {
+    app.use('/api/grammar', require('./routes/grammar.routes'));
+    console.log('✅ Grammar routes loaded');
+} catch (error) {
+    console.error('❌ Error loading grammar routes:', error.message);
+}
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'Route not found',
-        path: req.path
+    res.status(404).json({ 
+        success: false, 
+        message: 'Endpoint not found' 
     });
 });
 
-// Global error handler
+// Error handler
 app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    
-    res.status(err.status || 500).json({
-        success: false,
-        message: err.message || 'Internal server error',
-        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    console.error(err.stack);
+    res.status(500).json({ 
+        success: false, 
+        message: process.env.NODE_ENV === 'production' 
+            ? 'Something went wrong!' 
+            : err.message 
     });
 });
 
-// ==========================================
-// START SERVER
-// ==========================================
+// Start server
+const server = app.listen(PORT, () => {
+    console.log(`🚀 Bobolingo Backend running on port ${PORT}`);
+    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:5500'}`);
+});
 
-app.listen(PORT, () => {
-    console.log('🚀 ========================================');
-    console.log(`🚀 Bobolingo Backend API`);
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`🚀 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log('🚀 ========================================');
+// Handle server errors
+server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use!`);
+        process.exit(1);
+    } else {
+        console.error('❌ Server error:', error);
+        process.exit(1);
+    }
 });
 
 module.exports = app;

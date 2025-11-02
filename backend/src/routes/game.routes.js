@@ -1,114 +1,177 @@
 const express = require('express');
 const router = express.Router();
-const { supabase } = require('../services/supabase.service');
+const supabase = require('../config/supabase');
+const authMiddleware = require('../middleware/auth.middleware');
+const { validateGameScore } = require('../middleware/validator.middleware');
+const { STATUS, ERRORS } = require('../config/constants');
 
-/**
- * @route   POST /api/games/save-score
- * @desc    Save game score
- * @access  Private
- */
-router.post('/save-score', async (req, res) => {
+// POST /api/games/save-score - Save game score
+router.post('/save-score', authMiddleware, validateGameScore, async (req, res) => {
     try {
-        const { userId, gameType, score, difficulty, completed } = req.body;
-        
-        const { data, error } = await supabase
+        const userId = req.user.id;
+        const { game_type, score, difficulty, completed } = req.body;
+
+        const { data: savedScore, error } = await supabase
             .from('game_scores')
             .insert({
                 user_id: userId,
-                game_type: gameType,
-                score: score,
-                difficulty: difficulty,
+                game_type,
+                score,
+                difficulty,
                 completed: completed || false,
                 played_at: new Date().toISOString()
             })
             .select()
             .single();
-        
-        if (error) throw error;
-        
-        res.json({
+
+        if (error) {
+            console.error('Save score error:', error);
+            return res.status(STATUS.SERVER_ERROR).json({
+                success: false,
+                message: 'Failed to save score'
+            });
+        }
+
+        res.status(STATUS.CREATED).json({
             success: true,
             message: 'Score saved successfully',
-            data
+            data: { score: savedScore }
         });
     } catch (error) {
-        res.status(500).json({
+        console.error('Save score error:', error);
+        res.status(STATUS.SERVER_ERROR).json({
             success: false,
-            message: error.message
+            message: 'Failed to save score'
         });
     }
 });
 
-/**
- * @route   GET /api/games/leaderboard/:gameType
- * @desc    Get leaderboard for a specific game
- * @access  Public
- */
-router.get('/leaderboard/:gameType', async (req, res) => {
+// GET /api/games/leaderboard/:game_type - Get leaderboard for a specific game
+router.get('/leaderboard/:game_type', async (req, res) => {
     try {
-        const { gameType } = req.params;
+        const { game_type } = req.params;
         const limit = parseInt(req.query.limit) || 10;
-        
-        const { data, error } = await supabase
+
+        const { data: leaderboard, error } = await supabase
             .from('game_scores')
             .select(`
-                *,
+                id,
+                score,
+                difficulty,
+                played_at,
                 users (
                     id,
-                    name,
+                    username,
                     email
                 )
             `)
-            .eq('game_type', gameType)
+            .eq('game_type', game_type)
             .order('score', { ascending: false })
             .limit(limit);
-        
-        if (error) throw error;
-        
-        res.json({
+
+        if (error) {
+            console.error('Leaderboard error:', error);
+            return res.status(STATUS.SERVER_ERROR).json({
+                success: false,
+                message: 'Failed to retrieve leaderboard'
+            });
+        }
+
+        res.status(STATUS.OK).json({
             success: true,
-            leaderboard: data
+            data: { leaderboard }
         });
     } catch (error) {
-        res.status(500).json({
+        console.error('Leaderboard error:', error);
+        res.status(STATUS.SERVER_ERROR).json({
             success: false,
-            message: error.message
+            message: 'Failed to retrieve leaderboard'
         });
     }
 });
 
-/**
- * @route   GET /api/games/history
- * @desc    Get user's game history
- * @access  Private
- */
-router.get('/history', async (req, res) => {
+// GET /api/games/history - Get user's game history
+router.get('/history', authMiddleware, async (req, res) => {
     try {
-        const userId = req.query.userId;
-        const gameType = req.query.gameType; // optional filter
-        
+        const userId = req.user.id;
+        const game_type = req.query.game_type; // optional filter
+
         let query = supabase
             .from('game_scores')
             .select('*')
             .eq('user_id', userId)
             .order('played_at', { ascending: false });
-        
-        if (gameType) {
-            query = query.eq('game_type', gameType);
+
+        if (game_type) {
+            query = query.eq('game_type', game_type);
         }
-        
-        const { data, error } = await query;
-        
-        if (error) throw error;
-        
-        res.json({
+
+        const { data: history, error } = await query;
+
+        if (error) {
+            console.error('Game history error:', error);
+            return res.status(STATUS.SERVER_ERROR).json({
+                success: false,
+                message: 'Failed to retrieve game history'
+            });
+        }
+
+        res.status(STATUS.OK).json({
             success: true,
-            history: data
+            data: { history }
         });
     } catch (error) {
-        res.status(500).json({
+        console.error('Game history error:', error);
+        res.status(STATUS.SERVER_ERROR).json({
             success: false,
-            message: error.message
+            message: 'Failed to retrieve game history'
+        });
+    }
+});
+
+// GET /api/games/stats/:game_type - Get user statistics for a specific game
+router.get('/stats/:game_type', authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { game_type } = req.params;
+
+        const { data: scores, error } = await supabase
+            .from('game_scores')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('game_type', game_type);
+
+        if (error) {
+            console.error('Game stats error:', error);
+            return res.status(STATUS.SERVER_ERROR).json({
+                success: false,
+                message: 'Failed to retrieve game statistics'
+            });
+        }
+
+        const stats = {
+            totalPlayed: scores.length,
+            totalScore: scores.reduce((sum, s) => sum + (s.score || 0), 0),
+            averageScore: scores.length > 0 
+                ? Math.round(scores.reduce((sum, s) => sum + (s.score || 0), 0) / scores.length) 
+                : 0,
+            highestScore: scores.length > 0 
+                ? Math.max(...scores.map(s => s.score || 0))
+                : 0,
+            completionRate: scores.length > 0
+                ? Math.round((scores.filter(s => s.completed).length / scores.length) * 100)
+                : 0
+        };
+
+        res.status(STATUS.OK).json({
+            success: true,
+            data: { stats }
+        });
+    } catch (error) {
+        console.error('Game stats error:', error);
+        res.status(STATUS.SERVER_ERROR).json({
+            success: false,
+            message: 'Failed to retrieve game statistics'
         });
     }
 });
