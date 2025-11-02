@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Bobolingo</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <img src="assets/snoopy-removebg-preview.png" alt="Snoopy Logo" class="logo-icon">
+                    <a href="index.html" class="logo-link">Bobolingo</a>
+                </div>
+                
+                <div class="nav-right">
+                    <div class="language-selector">
+                        <span class="language-text">SITE LANGUAGE</span>
+                        <div class="language-dropdown">
+                            <img src="https://cdn-icons-png.flaticon.com/128/9906/9906532.png" alt="English Flag" class="flag-icon">
+                            <span>EN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Signup Content -->
+    <main class="main-content login-main">
+        <section class="login-section">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <h1 class="login-title">Create Account 🎉</h1>
+                        <p class="login-subtitle">Join Bobolingo and start learning today!</p>
+                    </div>
+
+                    <form class="login-form" id="signupForm">
+                        <div class="form-group">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" id="username" name="username" class="form-input" placeholder="Choose a username" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email address" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="password-input-container">
+                                <input type="password" id="password" name="password" class="form-input" placeholder="Create a password (min 6 characters)" required minlength="6">
+                                <button type="button" class="password-toggle" onclick="togglePassword()">
+                                    <i class="fas fa-eye" id="passwordIcon"></i>
+                                </button>
+                            </div>
+                            <small style="color: #666; font-size: 12px;">Password must be at least 6 characters</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary login-btn">
+                            <span class="btn-text">Sign Up</span>
+                            <i class="fas fa-user-plus btn-icon"></i>
+                        </button>
+
+                        <div class="signup-prompt" style="text-align: center; margin-top: 20px;">
+                            <p style="color: #666;">Already have an account? <a href="login.html" style="color: #6B46C1; font-weight: 600;">Sign In</a></p>
+                        </div>
+                    </form>
+
+                    <div class="divider">
+                        <span>or sign up with</span>
+                    </div>
+
+                    <div class="social-login">
+                        <button class="btn btn-social btn-google" type="button">
+                            <img src="https://cdn-icons-png.flaticon.com/128/2991/2991148.png" alt="Google">
+                            <span>Google</span>
+                        </button>
+                        <button class="btn btn-social btn-facebook" type="button">
+                            <img src="https://cdn-icons-png.flaticon.com/128/5968/5968764.png" alt="Facebook">
+                            <span>Facebook</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="illustration-card">
+                    <div class="illustration-content">
+                        <h2>Start Learning Today!</h2>
+                        <p>Join thousands of learners mastering new languages with Bobolingo</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="javascript/config.js"></script>
+    <script>
+        // Password toggle
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('passwordIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Handle signup
+        const signupForm = document.getElementById('signupForm');
+        signupForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+
+            // Show loading
+            const submitBtn = signupForm.querySelector('.login-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            btnText.textContent = 'Creating account...';
+            submitBtn.disabled = true;
+
+            try {
+                const result = await window.API.auth.register(email, password, username);
+                
+                if (result.success) {
+                    alert('Account created successfully! Redirecting to dashboard...');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    throw new Error(result.message || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert(error.message || 'Registration failed. Please try again.');
+                btnText.textContent = 'Sign Up';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
