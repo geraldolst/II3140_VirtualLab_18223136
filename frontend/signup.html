@@ -127,6 +127,8 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
+            console.log('📝 Signup attempt:', { email, username }); // Debug log
+
             if (!username || !email || !password) {
                 alert('Please fill in all fields');
                 return;
@@ -140,24 +142,30 @@
             // Show loading
             const submitBtn = signupForm.querySelector('.login-btn');
             const btnText = submitBtn.querySelector('.btn-text');
+            const originalText = btnText.textContent;
             btnText.textContent = 'Creating account...';
             submitBtn.disabled = true;
 
             try {
+                console.log('🚀 Calling register API...'); // Debug log
                 const result = await window.API.auth.register(email, password, username);
                 
-                if (result.success) {
+                console.log('✅ Register result:', result); // Debug log
+                
+                if (result.success && result.data) {
+                    console.log('🎉 Success! User data saved:', result.data.user); // Debug log
                     alert('Account created successfully! Redirecting to dashboard...');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1000);
+                    
+                    // Redirect immediately
+                    console.log('🔄 Redirecting to dashboard.html...'); // Debug log
+                    window.location.href = 'dashboard.html';
                 } else {
                     throw new Error(result.message || 'Registration failed');
                 }
             } catch (error) {
-                console.error('Signup error:', error);
+                console.error('❌ Signup error:', error); // Debug log
                 alert(error.message || 'Registration failed. Please try again.');
-                btnText.textContent = 'Sign Up';
+                btnText.textContent = originalText;
                 submitBtn.disabled = false;
             }
         });
