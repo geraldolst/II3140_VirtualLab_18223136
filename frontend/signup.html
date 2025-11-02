@@ -71,6 +71,13 @@
                         <div class="signup-prompt" style="text-align: center; margin-top: 20px;">
                             <p style="color: #666;">Already have an account? <a href="login.html" style="color: #6B46C1; font-weight: 600;">Sign In</a></p>
                         </div>
+
+                        <!-- Debug button for testing redirect -->
+                        <div style="text-align: center; margin-top: 10px;">
+                            <button type="button" onclick="window.location.href='dashboard.html'" style="background: #e0e0e0; color: #333; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 12px;">
+                                🔧 Test Dashboard Link
+                            </button>
+                        </div>
                     </form>
 
                     <div class="divider">
@@ -151,15 +158,31 @@
                 const result = await window.API.auth.register(email, password, username);
                 
                 console.log('✅ Register result:', result); // Debug log
+                console.log('📊 Full response data:', JSON.stringify(result, null, 2)); // Full data
                 
                 if (result.success && result.data) {
                     console.log('🎉 Success! User data saved:', result.data.user); // Debug log
+                    console.log('🔑 Token saved:', result.data.token ? 'YES' : 'NO'); // Token check
+                    console.log('💾 localStorage check:', localStorage.getItem('bobolingoUser')); // Storage check
+                    
                     alert('Account created successfully! Redirecting to dashboard...');
                     
-                    // Redirect immediately
-                    console.log('🔄 Redirecting to dashboard.html...'); // Debug log
-                    window.location.href = 'dashboard.html';
+                    // Force redirect with full path
+                    console.log('🔄 Attempting redirect...'); // Debug log
+                    console.log('� Current location:', window.location.href); // Current URL
+                    console.log('📍 Target location:', window.location.origin + '/frontend/dashboard.html'); // Target URL
+                    
+                    // Try multiple redirect methods
+                    try {
+                        window.location.href = 'dashboard.html';
+                        console.log('✅ Redirect initiated'); // Debug log
+                    } catch (redirectError) {
+                        console.error('❌ Redirect failed:', redirectError);
+                        // Fallback: try window.location.replace
+                        window.location.replace('dashboard.html');
+                    }
                 } else {
+                    console.error('⚠️ Registration succeeded but no data returned'); // Debug log
                     throw new Error(result.message || 'Registration failed');
                 }
             } catch (error) {
