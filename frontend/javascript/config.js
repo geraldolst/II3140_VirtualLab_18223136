@@ -3,7 +3,7 @@ const CONFIG = {
     // API URL - otomatis detect environment
     API_URL: window.location.hostname === 'localhost' 
         ? 'http://localhost:3000/api'  // Development
-        : 'https://bobolingo-backend-production.up.railway.app/api', // Production - UPDATE DENGAN URL RAILWAY ANDA!
+        : 'https://ii3140virtuallab18223136-production.up.railway.app/api', // Production - Railway backend
     
     // Supabase (untuk auth di frontend - optional)
     SUPABASE_URL: 'https://inlksxdnfiruqaiumofw.supabase.co',

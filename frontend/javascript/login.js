@@ -23,43 +23,67 @@ function initializeLoginForm() {
     }
 }
 
-// Handle login submission (Frontend only - no validation)
-function handleLogin() {
-    // Get form data
-    const formData = {
-        name: nameInput ? nameInput.value : 'User',
-        nim: nimInput ? nimInput.value : '',
-        email: emailInput ? emailInput.value : 'user@example.com',
-        password: passwordInput ? passwordInput.value : '',
-        rememberMe: rememberMeCheckbox ? rememberMeCheckbox.checked : false
-    };
+// Handle login submission - Connect to Backend API
+async function handleLogin() {
+    // Get form data - ONLY email and password needed for backend
+    const email = emailInput ? emailInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value : '';
+
+    // Simple validation
+    if (!email || !password) {
+        alert('Please enter email and password');
+        return;
+    }
 
     // Show loading state
     showLoadingState();
 
-    // Simulate login process with timeout
-    setTimeout(() => {
-        // Create user data (no validation, accept any input)
-        const userData = {
-            name: formData.name || 'User',
-            nim: formData.nim || '',
-            email: formData.email || 'user@example.com',
-            isLoggedIn: true,
-            loginDate: new Date().toISOString()
-        };
+    try {
+        // Call backend API
+        const result = await window.API.auth.login(email, password);
+        
+        if (result.success && result.data) {
+            // Backend returns: { user, token }
+            // Save to localStorage in same format as before
+            const userData = {
+                ...result.data.user,
+                token: result.data.token,
+                isLoggedIn: true,
+                loginDate: new Date().toISOString()
+            };
+            
+            localStorage.setItem('bobolingoUser', JSON.stringify(userData));
 
-        // Save to localStorage
-        localStorage.setItem('bobolingoUser', JSON.stringify(userData));
+            // Show success message
+            showSuccessMessage();
 
-        // Show success message
-        showSuccessMessage();
+            // Redirect to dashboard
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        } else {
+            throw new Error(result.message || 'Login failed');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert(error.message || 'Login failed. Please check your credentials.');
+        resetLoadingState();
+    }
+}
 
-        // Redirect to dashboard after short delay
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 1500);
+// Reset loading state
+function resetLoadingState() {
+    const loginBtn = document.querySelector('.login-btn');
+    if (loginBtn) {
+        const btnText = loginBtn.querySelector('.btn-text');
+        const btnIcon = loginBtn.querySelector('.btn-icon');
 
-    }, 2000); // 2 second delay to show loading
+        loginBtn.classList.remove('loading');
+        if (btnText) btnText.textContent = 'Sign In';
+        if (btnIcon) btnIcon.className = 'fas fa-sign-in-alt btn-icon';
+        loginBtn.disabled = false;
+        loginBtn.style.background = '';
+    }
 }
 
 // Show loading state
@@ -175,7 +199,7 @@ function initializePasswordToggle() {
     if (signupLink) {
         signupLink.addEventListener('click', function(e) {
             e.preventDefault();
-            window.location.href = 'welcome.html';
+            window.location.href = '../html/welcome.html';
         });
     }
 
@@ -233,5 +257,5 @@ function loginAsGuest() {
     localStorage.setItem('bobolingoUser', JSON.stringify(guestData));
 
     // Redirect to dashboard
-    window.location.href = 'dashboard.html';
+    window.location.href = '../html/dashboard.html';
 }
