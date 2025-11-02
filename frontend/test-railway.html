@@ -77,7 +77,8 @@
 
     <script src="javascript/config.js"></script>
     <script>
-        const API_URL = 'https://ii3140virtuallab18223136-production.up.railway.app/api';
+        // Use localhost for now since Railway needs root directory config
+        const API_URL = 'http://localhost:3001/api';
         
         function showResult(elementId, data, isError = false) {
             const el = document.getElementById(elementId);
