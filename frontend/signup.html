@@ -165,22 +165,8 @@
                     console.log('🔑 Token saved:', result.data.token ? 'YES' : 'NO'); // Token check
                     console.log('💾 localStorage check:', localStorage.getItem('bobolingoUser')); // Storage check
                     
-                    alert('Account created successfully! Redirecting to dashboard...');
-                    
-                    // Force redirect with full path
-                    console.log('🔄 Attempting redirect...'); // Debug log
-                    console.log('� Current location:', window.location.href); // Current URL
-                    console.log('📍 Target location:', window.location.origin + '/frontend/dashboard.html'); // Target URL
-                    
-                    // Try multiple redirect methods
-                    try {
-                        window.location.href = 'dashboard.html';
-                        console.log('✅ Redirect initiated'); // Debug log
-                    } catch (redirectError) {
-                        console.error('❌ Redirect failed:', redirectError);
-                        // Fallback: try window.location.replace
-                        window.location.replace('dashboard.html');
-                    }
+                    btnText.textContent = '✅ Success!';
+                    window.location.href = 'dashboard.html';
                 } else {
                     console.error('⚠️ Registration succeeded but no data returned'); // Debug log
                     throw new Error(result.message || 'Registration failed');
