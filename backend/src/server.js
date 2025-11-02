@@ -4,10 +4,13 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || 'production'; // Default to production
 
 // Middleware
 app.use(cors({
-    origin: '*', // Allow all origins in development
+    origin: NODE_ENV === 'production' 
+        ? ['https://bobolingolabfix.vercel.app', 'https://ii3140virtuallab18223136-production.up.railway.app']
+        : '*', // Allow all origins in development
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -73,7 +76,7 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ 
         success: false, 
-        message: process.env.NODE_ENV === 'production' 
+        message: NODE_ENV === 'production' 
             ? 'Something went wrong!' 
             : err.message 
     });
@@ -82,8 +85,8 @@ app.use((err, req, res, next) => {
 // Start server
 const server = app.listen(PORT, () => {
     console.log(`🚀 Bobolingo Backend running on port ${PORT}`);
-    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🌐 CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:5500'}`);
+    console.log(`📝 Environment: ${NODE_ENV}`);
+    console.log(`🌐 CORS enabled for: ${NODE_ENV === 'production' ? 'Vercel app' : 'localhost'}`);
 });
 
 // Handle server errors

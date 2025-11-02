@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Railway Backend</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #6B46C1; }
+        input, button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #6B46C1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background: #553C9A; }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #6B46C1;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .error { border-left-color: #e53e3e; }
+        .success { border-left-color: #38a169; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Railway Backend</h1>
+        
+        <h3>1. Test Register</h3>
+        <input type="email" id="registerEmail" placeholder="Email" value="test@example.com">
+        <input type="text" id="registerUsername" placeholder="Username" value="testuser">
+        <input type="password" id="registerPassword" placeholder="Password" value="password123">
+        <button onclick="testRegister()">Register</button>
+        <div id="registerResult" class="result" style="display:none;"></div>
+
+        <h3>2. Test Login</h3>
+        <input type="email" id="loginEmail" placeholder="Email" value="test@example.com">
+        <input type="password" id="loginPassword" placeholder="Password" value="password123">
+        <button onclick="testLogin()">Login</button>
+        <div id="loginResult" class="result" style="display:none;"></div>
+
+        <h3>3. Test Verify Token</h3>
+        <button onclick="testVerify()">Verify Token</button>
+        <div id="verifyResult" class="result" style="display:none;"></div>
+
+        <h3>4. Clear All Data</h3>
+        <button onclick="clearData()" style="background: #e53e3e;">Clear localStorage</button>
+    </div>
+
+    <script src="javascript/config.js"></script>
+    <script>
+        const API_URL = 'https://ii3140virtuallab18223136-production.up.railway.app/api';
+        
+        function showResult(elementId, data, isError = false) {
+            const el = document.getElementById(elementId);
+            el.style.display = 'block';
+            el.className = 'result ' + (isError ? 'error' : 'success');
+            el.textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function testRegister() {
+            try {
+                const email = document.getElementById('registerEmail').value;
+                const username = document.getElementById('registerUsername').value;
+                const password = document.getElementById('registerPassword').value;
+
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, username, password })
+                });
+
+                const data = await response.json();
+                showResult('registerResult', { 
+                    status: response.status, 
+                    statusText: response.statusText,
+                    data 
+                }, !response.ok);
+
+                // Save token if success
+                if (data.success && data.data && data.data.token) {
+                    const userData = {
+                        user: data.data.user,
+                        token: data.data.token,
+                        isLoggedIn: true
+                    };
+                    localStorage.setItem('bobolingoUser', JSON.stringify(userData));
+                    console.log('✅ Token saved to localStorage');
+                }
+            } catch (error) {
+                showResult('registerResult', { error: error.message }, true);
+            }
+        }
+
+        async function testLogin() {
+            try {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                showResult('loginResult', { 
+                    status: response.status, 
+                    statusText: response.statusText,
+                    data 
+                }, !response.ok);
+
+                // Save token if success
+                if (data.success && data.data && data.data.token) {
+                    const userData = {
+                        user: data.data.user,
+                        token: data.data.token,
+                        isLoggedIn: true
+                    };
+                    localStorage.setItem('bobolingoUser', JSON.stringify(userData));
+                    console.log('✅ Token saved to localStorage');
+                }
+            } catch (error) {
+                showResult('loginResult', { error: error.message }, true);
+            }
+        }
+
+        async function testVerify() {
+            try {
+                const userData = localStorage.getItem('bobolingoUser');
+                if (!userData) {
+                    showResult('verifyResult', { error: 'No token found. Login first!' }, true);
+                    return;
+                }
+
+                const { token } = JSON.parse(userData);
+                const response = await fetch(`${API_URL}/auth/verify`, {
+                    method: 'GET',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                showResult('verifyResult', { 
+                    status: response.status, 
+                    statusText: response.statusText,
+                    data 
+                }, !response.ok);
+            } catch (error) {
+                showResult('verifyResult', { error: error.message }, true);
+            }
+        }
+
+        function clearData() {
+            localStorage.clear();
+            alert('localStorage cleared!');
+            location.reload();
+        }
+
+        // Show stored data on load
+        window.onload = () => {
+            const userData = localStorage.getItem('bobolingoUser');
+            if (userData) {
+                console.log('📦 Stored user data:', JSON.parse(userData));
+            } else {
+                console.log('❌ No user data in localStorage');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -23,43 +23,56 @@ function initializeLoginForm() {
     }
 }
 
-// Handle login submission (Frontend only - no validation)
-function handleLogin() {
-    // Get form data
-    const formData = {
-        name: nameInput ? nameInput.value : 'User',
-        nim: nimInput ? nimInput.value : '',
-        email: emailInput ? emailInput.value : 'user@example.com',
-        password: passwordInput ? passwordInput.value : '',
-        rememberMe: rememberMeCheckbox ? rememberMeCheckbox.checked : false
-    };
+// Handle login submission - Backend API
+async function handleLogin() {
+    // Get form data - only email and password needed
+    const email = emailInput ? emailInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value : '';
+
+    // Basic validation
+    if (!email || !password) {
+        alert('Please enter email and password');
+        return;
+    }
 
     // Show loading state
     showLoadingState();
 
-    // Simulate login process with timeout
-    setTimeout(() => {
-        // Create user data (no validation, accept any input)
-        const userData = {
-            name: formData.name || 'User',
-            nim: formData.nim || '',
-            email: formData.email || 'user@example.com',
-            isLoggedIn: true,
-            loginDate: new Date().toISOString()
-        };
+    try {
+        // Call backend login API
+        const result = await window.API.auth.login(email, password);
+        
+        if (result.success && result.data) {
+            // Show success message
+            showSuccessMessage();
 
-        // Save to localStorage
-        localStorage.setItem('bobolingoUser', JSON.stringify(userData));
+            // Redirect to dashboard after short delay
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        } else {
+            throw new Error(result.message || 'Login failed');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert(error.message || 'Login failed. Please check your credentials and try again.');
+        resetLoadingState();
+    }
+}
 
-        // Show success message
-        showSuccessMessage();
+// Reset loading state on error
+function resetLoadingState() {
+    const loginBtn = document.querySelector('.login-btn');
+    if (loginBtn) {
+        const btnText = loginBtn.querySelector('.btn-text');
+        const btnIcon = loginBtn.querySelector('.btn-icon');
 
-        // Redirect to dashboard after short delay
-        setTimeout(() => {
-            window.location.href = '../html/dashboard.html';
-        }, 1500);
-
-    }, 2000); // 2 second delay to show loading
+        loginBtn.classList.remove('loading');
+        if (btnText) btnText.textContent = 'Sign In';
+        if (btnIcon) btnIcon.className = 'fas fa-sign-in-alt btn-icon';
+        loginBtn.disabled = false;
+        loginBtn.style.background = '';
+    }
 }
 
 // Show loading state

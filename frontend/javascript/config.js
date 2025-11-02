@@ -2,7 +2,7 @@
 const CONFIG = {
     // API URL - otomatis detect environment
     API_URL: window.location.hostname === 'localhost' 
-        ? 'http://localhost:3000/api'  // Development
+        ? 'http://localhost:3001/api'  // Development - using port 3001
         : 'https://ii3140virtuallab18223136-production.up.railway.app/api', // Production - Railway backend
     
     // Supabase (untuk auth di frontend - optional)
