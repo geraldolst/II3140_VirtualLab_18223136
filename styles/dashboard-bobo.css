@@ -1,0 +1,566 @@
+/* Dashboard Bobolingo Styles */
+/* Nuansa Bobolingo dengan warna yang konsisten */
+
+@font-face {
+    font-family: 'Mogula';
+    src: url('../fonts/Mogula.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html, body {
+    height: 100%; 
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;  
+    font-family: 'Mogula', 'Inter', sans-serif;
+    background: linear-gradient(to bottom, #DFF2EB, #ffffff);
+    color: #4A628A;
+}
+
+/* Header Styling */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: #DFF2EB;
+    border-bottom: none; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2em;
+    color: #4A628A;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+header h1:hover {
+    transform: scale(1.05);
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #7FB3D5;
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+nav a:hover {
+    background: #7FB3D5;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.profile-link {
+    background: #4A628A;
+    color: white !important;
+}
+
+.profile-link:hover {
+    background: #37527f;
+}
+
+/* Main Content */
+main {
+    flex: 1; 
+    overflow: auto;
+    padding: 20px 40px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto; 
+}
+
+/* Intro Section - Bobolingo Style */
+.intro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 60px;
+    min-height: 400px;
+    padding: 40px 0;
+}
+
+.intro-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    text-align: center;
+}
+
+.intro h2 {
+    font-size: 5.7em;
+    margin: 0 0 20px 0;
+    line-height: 1.2;
+    color: #4A628A;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.intro button {
+    background: linear-gradient(135deg, #4A628A, #7FB3D5);
+    color: white;
+    padding: 18px 40px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.7em;
+    font-family: 'Mogula', sans-serif;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(74, 98, 138, 0.3);
+}
+
+.intro button:hover {
+    background: linear-gradient(135deg, #37527f, #6a9ac4);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(74, 98, 138, 0.4);
+}
+
+.intro-image {
+    flex: 0 0 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.level-up-icon {
+    max-width: 100%;
+    height: auto;
+    max-height: 400px;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
+}
+
+/* Games Section - Bobolingo Style */
+.games {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px; 
+    flex-wrap: wrap; 
+    max-width: 100%; 
+    margin-top: 40px;
+}
+
+.game-option {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    width: calc(50% - 15px); 
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.game-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #4A628A, #7FB3D5);
+}
+
+.game-option:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 30px rgba(74, 98, 138, 0.2);
+}
+
+.game-icon-wrapper {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #DFF2EB, #B9E5E8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.game-option:hover .game-icon-wrapper {
+    transform: scale(1.1) rotate(5deg);
+    background: linear-gradient(135deg, #7FB3D5, #4A628A);
+}
+
+.game-icon-fa {
+    font-size: 4em;
+    color: #4A628A;
+    transition: color 0.3s ease;
+}
+
+.game-option:hover .game-icon-fa {
+    color: white;
+}
+
+.game-option h3 {
+    margin: 15px 0;
+    font-size: 2.5em;
+    color: #4A628A;
+}
+
+.game-option p {
+    font-family: 'Mogula', sans-serif;
+    color: #7A9CBD;
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+/* Difficulty Selection */
+#scrambobo-section,
+#memoribo-section {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+#scrambobo-section h2,
+#memoribo-section h2 {
+    font-size: 4em; 
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #4A628A;
+}
+
+#scrambobo-section p,
+#memoribo-section p {
+    font-size: 1.5em;
+    color: #7FB3D5;
+    margin-bottom: 30px;
+}
+
+.difficulty-options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.difficulty-options button {
+    background: linear-gradient(135deg, #4A628A, #7FB3D5);
+    color: white;
+    padding: 18px 40px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.7em;
+    font-family: 'Mogula', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(74, 98, 138, 0.3);
+}
+
+.difficulty-options button:hover {
+    background: linear-gradient(135deg, #37527f, #6a9ac4);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(74, 98, 138, 0.4);
+}
+
+/* Game Play Section */
+#scrambobo-game-section {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.game-header {
+    margin-bottom: 40px;
+}
+
+.game-header h2 {
+    font-size: 4em;
+    color: #4A628A;
+    margin-bottom: 10px;
+}
+
+.game-header p {
+    font-size: 1.5em;
+    color: #7FB3D5;
+}
+
+/* Scrambled Letters */
+#scrambled-letters {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin: 40px 0;
+    min-height: 100px;
+}
+
+.letter {
+    background: linear-gradient(135deg, #4A628A, #7FB3D5);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    font-size: 2.5em;
+    cursor: grab;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    user-select: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(74, 98, 138, 0.3);
+}
+
+.letter:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(74, 98, 138, 0.4);
+}
+
+.letter:active {
+    cursor: grabbing;
+}
+
+.dragging {
+    opacity: 0.5;
+    transform: scale(1.1);
+}
+
+/* Game Controls */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.button-container button,
+.reset-btn {
+    background: linear-gradient(135deg, #4A628A, #7FB3D5);
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.3em;
+    font-family: 'Mogula', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(74, 98, 138, 0.3);
+}
+
+.button-container button:hover,
+.reset-btn:hover {
+    background: linear-gradient(135deg, #37527f, #6a9ac4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(74, 98, 138, 0.4);
+}
+
+#game-feedback {
+    margin-top: 30px;
+    font-size: 1.5em;
+    font-weight: bold;
+    min-height: 40px;
+    padding: 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+/* Memory Game */
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    margin: 40px auto;
+    max-width: 900px;
+}
+
+.memory-card {
+    width: 100%;
+    aspect-ratio: 3/2;
+    background: linear-gradient(135deg, #4A628A, #7FB3D5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1em;
+    cursor: pointer;
+    border-radius: 15px;
+    user-select: none;
+    text-align: center;
+    padding: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(74, 98, 138, 0.3);
+}
+
+.memory-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(74, 98, 138, 0.4);
+}
+
+.memory-card.flipped {
+    background: white;
+    color: #4A628A;
+    border: 3px solid #4A628A;
+}
+
+.memory-card.matched {
+    background: linear-gradient(135deg, #B9E5E8, #DFF2EB);
+    color: #4A628A;
+    border: 3px solid #7FB3D5;
+}
+
+#memory-feedback {
+    font-size: 2em;
+    color: #4A628A;
+    margin-top: 30px;
+    text-align: center;
+    font-weight: bold;
+    min-height: 50px;
+}
+
+.reset-btn {
+    margin: 30px auto 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* Footer */
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #DFF2EB;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 60px;
+}
+
+.footer-left, .footer-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.footer-left {
+    justify-content: flex-start;
+    color: #4A628A;
+}
+
+.footer-right {
+    justify-content: flex-end;
+    white-space: nowrap;
+    color: #4A628A;
+}
+
+footer p {
+    margin: 0;
+    font-size: 1em;
+}
+
+footer i.fa-heart {
+    color: #e74c3c;
+    margin: 0 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .intro {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .intro h2 {
+        font-size: 3.5em;
+    }
+
+    .games {
+        flex-direction: column;
+    }
+
+    .game-option {
+        width: 100%;
+    }
+
+    .memory-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    #scrambled-letters {
+        gap: 10px;
+    }
+
+    .letter {
+        width: 50px;
+        height: 50px;
+        font-size: 2em;
+        padding: 20px;
+    }
+
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    nav a {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    .intro h2 {
+        font-size: 2.5em;
+    }
+
+    .game-header h2 {
+        font-size: 2.5em;
+    }
+
+    .memory-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .difficulty-options {
+        flex-direction: column;
+    }
+
+    .difficulty-options button {
+        width: 100%;
+    }
+}
