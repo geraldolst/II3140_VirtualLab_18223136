@@ -141,16 +141,250 @@ async function loadUserData(user) {
     if (welcomeTitle) {
         welcomeTitle.textContent = `Welcome back, ${displayName}! 🎉`;
     }
-    try {
-        const statsRes = await window.API.user.getStats();
-        if (statsRes.success) {
-            const { totalScore, scramboboGames, memoriboGames } = statsRes.data.stats;
-            // Tampilkan di UI, misal:
-            document.querySelector('.stat-number').textContent = totalScore;
+
+    // Load user stats and tier
+    await loadUserStats();
+    
+    // Load game history
+    await loadGameHistory();
+}
+
+// Calculate tier based on total score
+function calculateTier(totalScore) {
+    const tiers = [
+        { name: 'Bronze', min: 0, max: 499, color: '#CD7F32', icon: '🥉' },
+        { name: 'Silver', min: 500, max: 1499, color: '#C0C0C0', icon: '🥈' },
+        { name: 'Gold', min: 1500, max: 2999, color: '#FFD700', icon: '🥇' },
+        { name: 'Platinum', min: 3000, max: 4999, color: '#E5E4E2', icon: '💎' },
+        { name: 'Diamond', min: 5000, max: 9999, color: '#B9F2FF', icon: '💠' },
+        { name: 'Master', min: 10000, max: Infinity, color: '#FF6B9D', icon: '👑' }
+    ];
+
+    for (let tier of tiers) {
+        if (totalScore >= tier.min && totalScore <= tier.max) {
+            return tier;
         }
-    } catch (err) {
-        console.warn('Gagal muat statistik');
     }
+    return tiers[0]; // Default Bronze
+}
+
+// Load user stats from database
+async function loadUserStats() {
+    try {
+        // Get user stats from backend
+        const statsResponse = await window.API.user.getStats();
+        
+        if (statsResponse.success && statsResponse.data) {
+            const stats = statsResponse.data.stats;
+            
+            // Calculate total score
+            const totalScore = stats.totalScore || 0;
+            const scramboboGames = stats.scramboboGames || 0;
+            const memoriboGames = stats.memoriboGames || 0;
+            const totalGames = scramboboGames + memoriboGames;
+            
+            // Calculate tier
+            const tier = calculateTier(totalScore);
+            
+            // Update stats cards
+            updateStatsCard(0, totalScore, 'Total Points', '⭐');
+            updateStatsCard(1, tier.name, 'Current Tier', tier.icon);
+            updateStatsCard(2, totalGames, 'Games Played', '🎮');
+            
+            // Display tier badge
+            displayTierBadge(tier, totalScore);
+        } else {
+            // Default stats if no data
+            updateStatsCard(0, 0, 'Total Points', '⭐');
+            updateStatsCard(1, 'Bronze', 'Current Tier', '🥉');
+            updateStatsCard(2, 0, 'Games Played', '🎮');
+        }
+    } catch (error) {
+        console.error('Failed to load user stats:', error);
+        // Show default stats on error
+        updateStatsCard(0, 0, 'Total Points', '⭐');
+        updateStatsCard(1, 'Bronze', 'Current Tier', '🥉');
+        updateStatsCard(2, 0, 'Games Played', '🎮');
+    }
+}
+
+// Update individual stat card
+function updateStatsCard(index, value, label, icon) {
+    const statCards = document.querySelectorAll('.stat-card');
+    if (statCards[index]) {
+        const numberElement = statCards[index].querySelector('.stat-number');
+        const labelElement = statCards[index].querySelector('.stat-label');
+        const iconElement = statCards[index].querySelector('.stat-icon i');
+        
+        if (numberElement) {
+            numberElement.textContent = value;
+        }
+        if (labelElement) {
+            labelElement.textContent = label;
+        }
+        if (iconElement && icon) {
+            iconElement.className = '';
+            iconElement.textContent = icon;
+        }
+    }
+}
+
+// Display tier badge on dashboard
+function displayTierBadge(tier, totalScore) {
+    // Create or update tier badge
+    let tierBadge = document.querySelector('.tier-badge');
+    
+    if (!tierBadge) {
+        const statsGrid = document.querySelector('.stats-grid');
+        if (statsGrid) {
+            tierBadge = document.createElement('div');
+            tierBadge.className = 'tier-badge';
+            statsGrid.insertAdjacentElement('afterend', tierBadge);
+        } else {
+            return;
+        }
+    }
+    
+    // Calculate progress to next tier
+    const tiers = [
+        { name: 'Bronze', min: 0, max: 499 },
+        { name: 'Silver', min: 500, max: 1499 },
+        { name: 'Gold', min: 1500, max: 2999 },
+        { name: 'Platinum', min: 3000, max: 4999 },
+        { name: 'Diamond', min: 5000, max: 9999 },
+        { name: 'Master', min: 10000, max: Infinity }
+    ];
+    
+    const currentTierIndex = tiers.findIndex(t => t.name === tier.name);
+    const nextTier = currentTierIndex < tiers.length - 1 ? tiers[currentTierIndex + 1] : null;
+    
+    let progressHtml = '';
+    if (nextTier) {
+        const pointsNeeded = nextTier.min - totalScore;
+        const progressPercent = ((totalScore - tier.min) / (tier.max - tier.min + 1)) * 100;
+        
+        progressHtml = `
+            <div class="tier-progress">
+                <div class="tier-progress-bar" style="width: ${progressPercent}%"></div>
+            </div>
+            <p class="tier-next">Next tier: ${nextTier.name} (${pointsNeeded} points needed)</p>
+        `;
+    } else {
+        progressHtml = '<p class="tier-next">🎉 Maximum tier reached!</p>';
+    }
+    
+    tierBadge.innerHTML = `
+        <div class="tier-info">
+            <span class="tier-icon" style="font-size: 48px;">${tier.icon}</span>
+            <h2 class="tier-name" style="color: ${tier.color};">${tier.name} Tier</h2>
+            <p class="tier-score">${totalScore} Total Points</p>
+            ${progressHtml}
+        </div>
+    `;
+}
+
+// Load game history from database
+async function loadGameHistory() {
+    try {
+        const historyResponse = await window.API.game.getHistory();
+        
+        if (historyResponse.success && historyResponse.data) {
+            const games = historyResponse.data.games || [];
+            displayGameHistory(games);
+        }
+    } catch (error) {
+        console.error('Failed to load game history:', error);
+    }
+}
+
+// Display game history
+function displayGameHistory(games) {
+    // Find or create game history section
+    let historySection = document.getElementById('game-history-section');
+    
+    if (!historySection) {
+        const dashboardSection = document.getElementById('dashboard');
+        if (dashboardSection) {
+            historySection = document.createElement('div');
+            historySection.id = 'game-history-section';
+            historySection.className = 'game-history-container';
+            dashboardSection.appendChild(historySection);
+        } else {
+            return;
+        }
+    }
+    
+    if (games.length === 0) {
+        historySection.innerHTML = `
+            <div class="history-header">
+                <h2>🎮 Recent Games</h2>
+            </div>
+            <p class="no-games">No games played yet. Start playing to see your history!</p>
+        `;
+        return;
+    }
+    
+    // Group games by type
+    const scramboboGames = games.filter(g => g.game_type === 'scrambobo').slice(0, 5);
+    const memoriboGames = games.filter(g => g.game_type === 'memorybo').slice(0, 5);
+    
+    let historyHtml = `
+        <div class="history-header">
+            <h2>🎮 Recent Games</h2>
+        </div>
+        <div class="game-stats-grid">
+    `;
+    
+    // Scrambobo stats
+    if (scramboboGames.length > 0) {
+        const avgScore = Math.round(scramboboGames.reduce((sum, g) => sum + g.score, 0) / scramboboGames.length);
+        const bestScore = Math.max(...scramboboGames.map(g => g.score));
+        
+        historyHtml += `
+            <div class="game-stat-card">
+                <h3>🧩 Scrambobo</h3>
+                <div class="stat-detail">
+                    <span class="stat-label">Games Played:</span>
+                    <span class="stat-value">${scramboboGames.length}</span>
+                </div>
+                <div class="stat-detail">
+                    <span class="stat-label">Best Score:</span>
+                    <span class="stat-value">${bestScore}</span>
+                </div>
+                <div class="stat-detail">
+                    <span class="stat-label">Average:</span>
+                    <span class="stat-value">${avgScore}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Memorybo stats
+    if (memoriboGames.length > 0) {
+        const avgScore = Math.round(memoriboGames.reduce((sum, g) => sum + g.score, 0) / memoriboGames.length);
+        const bestScore = Math.max(...memoriboGames.map(g => g.score));
+        
+        historyHtml += `
+            <div class="game-stat-card">
+                <h3>🧠 Memorybo</h3>
+                <div class="stat-detail">
+                    <span class="stat-label">Games Played:</span>
+                    <span class="stat-value">${memoriboGames.length}</span>
+                </div>
+                <div class="stat-detail">
+                    <span class="stat-label">Best Score:</span>
+                    <span class="stat-value">${bestScore}</span>
+                </div>
+                <div class="stat-detail">
+                    <span class="stat-label">Average:</span>
+                    <span class="stat-value">${avgScore}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    historyHtml += '</div>';
+    historySection.innerHTML = historyHtml;
 }
 
 // Initialize user menu
