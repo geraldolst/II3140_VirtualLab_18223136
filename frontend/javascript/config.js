@@ -1,8 +1,9 @@
 // API Configuration
 const CONFIG = {
     // API URL - always use Railway for now (local backend has issues)
-    API_URL: 'https://ii3140virtuallab18223136-production.up.railway.app/api',
-    
+    // API_URL: 'https://ii3140virtuallab18223136-production.up.railway.app/api',
+    API_URL: 'http://localhost:3001/api',
+
     // Supabase (untuk auth di frontend - optional)
     SUPABASE_URL: 'https://inlksxdnfiruqaiumofw.supabase.co',
     SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlubGtzeGRuZmlydXFhaXVtb2Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMjg0NTIsImV4cCI6MjA3NTYwNDQ1Mn0.35KjPxnqPSJD5PcNJiOinrDu2RlG3rPUDKdre3dSxXU'
@@ -49,14 +50,14 @@ window.API = {
     // Generic API call helper
     async call(endpoint, options = {}) {
         const token = this.getToken();
-        
+
         const defaultOptions = {
             headers: {
                 'Content-Type': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
             }
         };
-        
+
         try {
             const response = await fetch(`${CONFIG.API_URL}${endpoint}`, {
                 ...defaultOptions,
@@ -66,13 +67,13 @@ window.API = {
                     ...options.headers
                 }
             });
-            
+
             const data = await response.json();
-            
+
             if (!response.ok) {
                 throw new Error(data.message || 'API request failed');
             }
-            
+
             return data;
         } catch (error) {
             console.error('API Error:', error);
@@ -87,7 +88,7 @@ window.API = {
                 method: 'POST',
                 body: JSON.stringify({ email, password })
             });
-            
+
             // Save user data with token
             if (response.success && response.data) {
                 window.API.setUserData({
@@ -95,16 +96,16 @@ window.API = {
                     token: response.data.token
                 });
             }
-            
+
             return response;
         },
-        
+
         async register(email, password, username) {
             const response = await window.API.call('/auth/register', {
                 method: 'POST',
                 body: JSON.stringify({ email, password, username })
             });
-            
+
             // Save user data with token
             if (response.success && response.data) {
                 window.API.setUserData({
@@ -112,10 +113,10 @@ window.API = {
                     token: response.data.token
                 });
             }
-            
+
             return response;
         },
-        
+
         async logout() {
             try {
                 await window.API.call('/auth/logout', { method: 'POST' });
@@ -137,14 +138,14 @@ window.API = {
         async getProfile() {
             return window.API.call('/users/profile');
         },
-        
+
         async updateProfile(username) {
             return window.API.call('/users/profile', {
                 method: 'PUT',
                 body: JSON.stringify({ username })
             });
         },
-        
+
         async getStats() {
             return window.API.call('/users/stats');
         },
@@ -153,12 +154,12 @@ window.API = {
             const response = await window.API.call('/users/account', {
                 method: 'DELETE'
             });
-            
+
             // Clear local data after deletion
             if (response.success) {
                 window.API.clearUserData();
             }
-            
+
             return response;
         }
     },
@@ -176,11 +177,11 @@ window.API = {
                 })
             });
         },
-        
+
         async getLeaderboard(game_type, limit = 10) {
             return window.API.call(`/games/leaderboard/${game_type}?limit=${limit}`);
         },
-        
+
         async getHistory(game_type = null) {
             const query = game_type ? `?game_type=${game_type}` : '';
             return window.API.call(`/games/history${query}`);

@@ -5,20 +5,20 @@ module.exports = {
     // JWT Configuration
     JWT_SECRET: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
     JWT_EXPIRE: '7d',
-    
+
     // Game Types
     GAME_TYPES: {
         SCRAMBOBO: 'scrambobo',
         MEMORIBO: 'memoribo'
     },
-    
+
     // Difficulty Levels
     DIFFICULTY: {
         EASY: 'easy',
         MEDIUM: 'medium',
         HARD: 'hard'
     },
-    
+
     // HTTP Status Codes
     STATUS: {
         OK: 200,
@@ -30,7 +30,7 @@ module.exports = {
         CONFLICT: 409,
         SERVER_ERROR: 500
     },
-    
+
     // Error Messages
     ERRORS: {
         INVALID_CREDENTIALS: 'Invalid email or password',

@@ -21,29 +21,29 @@ let userProfile = null;
 async function checkAuthAndLoadUser() {
     try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error || !session) {
             console.log('No active session');
             loadGuestMode();
             return;
         }
-        
+
         currentUser = session.user;
-        
+
         // Load user profile from database
         const { data: profile, error: profileError } = await supabase
             .from('users')
             .select('*')
             .eq('id', currentUser.id)
             .single();
-        
+
         if (!profileError && profile) {
             userProfile = profile;
             updateUserDisplay();
         } else {
             loadGuestMode();
         }
-        
+
     } catch (error) {
         console.error('Auth check error:', error);
         loadGuestMode();
@@ -53,11 +53,11 @@ async function checkAuthAndLoadUser() {
 function updateUserDisplay() {
     const userNameElement = document.getElementById('headerUserName');
     const userInitialElement = document.getElementById('userInitial');
-    
+
     if (userProfile) {
         const displayName = userProfile.full_name || userProfile.email?.split('@')[0] || 'User';
         const initial = displayName.charAt(0).toUpperCase();
-        
+
         if (userNameElement) userNameElement.textContent = displayName;
         if (userInitialElement) userInitialElement.textContent = initial;
     }
@@ -66,7 +66,7 @@ function updateUserDisplay() {
 function loadGuestMode() {
     const userNameElement = document.getElementById('headerUserName');
     const userInitialElement = document.getElementById('userInitial');
-    
+
     if (userNameElement) userNameElement.textContent = 'Guest';
     if (userInitialElement) userInitialElement.textContent = 'G';
 }
@@ -83,24 +83,24 @@ function hideAllSections() {
     document.getElementById("memoribo-section").style.display = "none";
 }
 
-window.showHome = function() {
+window.showHome = function () {
     hideAllSections();
     document.getElementById("intro-section").style.display = "flex";
     document.getElementById("games-section").style.display = "block";
 }
 
-window.showScrambobo = function() {
+window.showScrambobo = function () {
     hideAllSections();
     document.getElementById("scrambobo-section").style.display = "block";
 }
 
-window.showMemoribo = function() {
+window.showMemoribo = function () {
     hideAllSections();
     document.getElementById("memoribo-section").style.display = "block";
     initMemoriboGame();
 }
 
-window.scrollToGames = function() {
+window.scrollToGames = function () {
     document.getElementById("games-section").scrollIntoView({ behavior: "smooth" });
 }
 
@@ -155,14 +155,14 @@ let scramboboState = {
     draggedItem: null
 };
 
-window.startScrambobo = function(level) {
+window.startScrambobo = function (level) {
     scramboboState.currentLevel = level;
     scramboboState.score = 0;
     scramboboState.correctAnswers = 0;
-    
+
     hideAllSections();
     document.getElementById("scrambobo-game-section").style.display = "block";
-    
+
     updateScramboboStats();
     loadScramboboWord(level);
 }
@@ -174,9 +174,9 @@ function loadScramboboWord(level) {
 
     const wordData = scramboboWords[level][Math.floor(Math.random() * scramboboWords[level].length)];
     scramboboState.currentWord = wordData;
-    
+
     let scrambled = shuffleWord(wordData.word.split(''));
-    
+
     const scrambledContainer = document.getElementById("scrambled-letters");
     scrambledContainer.innerHTML = '';
 
@@ -236,20 +236,24 @@ function drop(event) {
     }
 }
 
-window.checkScramboboAnswer = function() {
+window.checkScramboboAnswer = async function () {
     let scrambledContainer = document.getElementById("scrambled-letters");
     let userWord = Array.from(scrambledContainer.children).map(letter => letter.textContent).join('');
 
     let feedback = document.getElementById("scrambobo-feedback");
-    
+
     if (userWord === scramboboState.currentWord.word) {
         feedback.textContent = "🎉 Correct! Well done!";
         feedback.className = "game-feedback success";
-        
+
         scramboboState.score += 10;
         scramboboState.correctAnswers++;
         updateScramboboStats();
-        
+        try {
+            await window.API.game.saveScore('scrambobo', 10, scramboboState.currentLevel, false);
+        } catch (err) {
+            console.error('Gagal simpan skor Scrambobo:', err);
+        }
         setTimeout(() => loadScramboboWord(scramboboState.currentLevel), 1500);
     } else {
         feedback.textContent = "❌ Try again!";
@@ -257,13 +261,13 @@ window.checkScramboboAnswer = function() {
     }
 }
 
-window.giveScramboboHint = function() {
+window.giveScramboboHint = function () {
     let feedback = document.getElementById("scrambobo-feedback");
     feedback.textContent = `💡 Hint: ${scramboboState.currentWord.hint}`;
     feedback.className = "game-feedback hint";
 }
 
-window.nextScramboboQuestion = function() {
+window.nextScramboboQuestion = function () {
     loadScramboboWord(scramboboState.currentLevel);
 }
 
@@ -304,7 +308,7 @@ function initMemoriboGame() {
     // Select random 6 word pairs
     let selectedPairs = [];
     let availablePairs = [...memoriboWordPairs];
-    
+
     while (selectedPairs.length < 6 && availablePairs.length > 0) {
         let randomIndex = Math.floor(Math.random() * availablePairs.length);
         selectedPairs.push(availablePairs[randomIndex]);
@@ -354,7 +358,7 @@ function renderMemoriboCards() {
                 </div>
             </div>
         `;
-        
+
         cardElement.addEventListener('click', () => flipMemoriboCard(cardElement, index));
         memoryGameContainer.appendChild(cardElement);
     });
@@ -363,8 +367,8 @@ function renderMemoriboCards() {
 }
 
 function flipMemoriboCard(cardElement, index) {
-    if (!memoriboState.canFlip || 
-        cardElement.classList.contains('flipped') || 
+    if (!memoriboState.canFlip ||
+        cardElement.classList.contains('flipped') ||
         memoriboState.matchedCards.includes(index)) {
         return;
     }
@@ -381,25 +385,25 @@ function flipMemoriboCard(cardElement, index) {
 
 function checkMemoriboMatch() {
     memoriboState.canFlip = false;
-    
+
     let [card1, card2] = memoriboState.flippedCards;
     let element1 = card1.element;
     let element2 = card2.element;
 
-    if (element1.dataset.pair === element2.dataset.text && 
+    if (element1.dataset.pair === element2.dataset.text &&
         element2.dataset.pair === element1.dataset.text) {
         // Match found!
         memoriboState.matchedCards.push(card1.index, card2.index);
         memoriboState.matches++;
         updateMemoriboStats();
-        
+
         element1.classList.add('matched');
         element2.classList.add('matched');
-        
+
         let feedback = document.getElementById('memoribo-feedback');
         feedback.textContent = '🎉 Match found!';
         feedback.className = 'game-feedback success';
-        
+
         setTimeout(() => {
             feedback.textContent = '';
         }, 1500);
@@ -431,7 +435,7 @@ function updateMemoriboStats() {
     document.getElementById('memoribo-moves').textContent = memoriboState.moves;
 }
 
-window.resetMemoriboGame = function() {
+window.resetMemoriboGame = function () {
     initMemoriboGame();
 }
 
@@ -439,7 +443,7 @@ window.resetMemoriboGame = function() {
 // 5. Initialize on Page Load
 // ==============================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     checkAuthAndLoadUser();
     showHome();
 });

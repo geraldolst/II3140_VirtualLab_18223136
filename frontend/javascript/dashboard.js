@@ -10,7 +10,7 @@ const grammarResults = document.getElementById('grammarResults');
 const grammarLanguage = document.getElementById('grammarLanguage');
 
 // Initialize dashboard
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     await checkAuthAndLoadUser();
     initializeNavigation();
     initializeGrammarChecker();
@@ -19,33 +19,86 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // Check authentication and load user data
+// async function checkAuthAndLoadUser() {
+//     // const token = localStorage.getItem('token');
+
+//     // const userData = localStorage.getItem('bobolingoUser');
+//     // const token = userData ? JSON.parse(userData).token : null;
+
+//     const token = window.API.getToken();
+
+//     if (!token) {
+//         // No token, redirect to login
+//         window.location.href = 'login.html';
+//         return;
+//     }
+
+//     try {
+//         // Verify token with backend
+//         const result = await window.API.auth.verifyToken();
+
+//         if (result.success && result.data && result.data.user) {
+//             // Load user data
+//             loadUserData(result.data.user);
+//         } else {
+//             // Invalid token
+//             throw new Error('Invalid session');
+//         }
+//     } catch (error) {
+//         console.error('Auth check error:', error);
+//         // Clear invalid token and redirect
+//         // localStorage.removeItem('token');
+//         window.API.clearUserData();
+//         window.location.href = 'login.html';
+//     }
+// }
+// async function checkAuthAndLoadUser() {
+//     // ✅ Ambil data user yang disimpan oleh config.js
+//     const userDataStr = localStorage.getItem('bobolingoUser');
+
+//     if (!userDataStr) {
+//         window.location.href = 'login.html';
+//         return;
+//     }
+
+//     let userData;
+//     try {
+//         userData = JSON.parse(userDataStr);
+//     } catch (e) {
+//         console.error('Invalid user data in localStorage');
+//         window.location.href = 'login.html';
+//         return;
+//     }
+
+//     const token = userData.token;
+//     if (!token) {
+//         window.location.href = 'login.html';
+//         return;
+//     }
+
+//     try {
+//         // Gunakan API helper untuk verifikasi token
+//         const result = await window.API.auth.verifyToken();
+//         if (result.success && result.data?.user) {
+//             loadUserData(result.data.user);
+//         } else {
+//             throw new Error('Token tidak valid');
+//         }
+//     } catch (error) {
+//         console.error('Auth verification failed:', error);
+//         localStorage.removeItem('bobolingoUser');
+//         window.location.href = 'login.html';
+//     }
+// }
+
 async function checkAuthAndLoadUser() {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-        // No token, redirect to login
+    const userDataStr = localStorage.getItem('bobolingoUser');
+    if (!userDataStr) {
         window.location.href = 'login.html';
         return;
     }
-    
-    try {
-        // Verify token with backend
-        const result = await window.API.auth.verifyToken();
-        
-        if (result.success && result.data && result.data.user) {
-            // Load user data
-            loadUserData(result.data.user);
-        } else {
-            // Invalid token
-            throw new Error('Invalid session');
-        }
-    } catch (error) {
-        console.error('Auth check error:', error);
-        // Clear invalid token and redirect
-        localStorage.removeItem('token');
-        window.API.clearUserData();
-        window.location.href = 'login.html';
-    }
+    const userData = JSON.parse(userDataStr);
+    loadUserData(userData.user); // Langsung load, tanpa API verify
 }
 
 // Load guest mode
@@ -53,56 +106,66 @@ function loadGuestMode() {
     const userNameElement = document.querySelector('.user-name');
     const userInitialElement = document.querySelector('.avatar-letter');
     const welcomeTitle = document.querySelector('.section-title');
-    
+
     if (userNameElement) {
         userNameElement.textContent = 'Guest';
     }
-    
+
     if (userInitialElement) {
         userInitialElement.textContent = 'G';
     }
-    
+
     if (welcomeTitle) {
         welcomeTitle.textContent = 'Welcome to Bobolingo! 🎉';
     }
 }
 
 // Load user data into dashboard
-function loadUserData(user) {
+async function loadUserData(user) {
     const userNameElement = document.querySelector('.user-name');
     const userInitialElement = document.querySelector('.avatar-letter');
     const welcomeTitle = document.querySelector('.section-title');
-    
+
     // Use username or extract from email
     const displayName = user.username || user.email.split('@')[0];
     const initial = displayName.charAt(0).toUpperCase();
-    
+
     if (userNameElement) {
         userNameElement.textContent = displayName;
     }
-    
+
     if (userInitialElement) {
         userInitialElement.textContent = initial;
     }
-    
+
     if (welcomeTitle) {
         welcomeTitle.textContent = `Welcome back, ${displayName}! 🎉`;
+    }
+    try {
+        const statsRes = await window.API.user.getStats();
+        if (statsRes.success) {
+            const { totalScore, scramboboGames, memoriboGames } = statsRes.data.stats;
+            // Tampilkan di UI, misal:
+            document.querySelector('.stat-number').textContent = totalScore;
+        }
+    } catch (err) {
+        console.warn('Gagal muat statistik');
     }
 }
 
 // Initialize user menu
 function initializeUserMenu() {
     const userMenu = document.querySelector('.user-menu');
-    
+
     if (userMenu) {
-        userMenu.addEventListener('click', function(e) {
+        userMenu.addEventListener('click', function (e) {
             e.stopPropagation();
             toggleUserDropdown();
         });
     }
-    
+
     // Close dropdown when clicking outside
-    document.addEventListener('click', function() {
+    document.addEventListener('click', function () {
         hideUserDropdown();
     });
 }
@@ -110,14 +173,14 @@ function initializeUserMenu() {
 // Toggle user dropdown menu
 function toggleUserDropdown() {
     let dropdown = document.querySelector('.user-dropdown');
-    
+
     if (!dropdown) {
         createUserDropdown();
         dropdown = document.querySelector('.user-dropdown');
     }
-    
+
     const isVisible = dropdown.style.display === 'block';
-    
+
     if (isVisible) {
         hideUserDropdown();
     } else {
@@ -129,9 +192,9 @@ function toggleUserDropdown() {
 function createUserDropdown() {
     const userMenu = document.querySelector('.user-menu');
     const userData = localStorage.getItem('bobolingoUser');
-    
+
     let dropdownContent;
-    
+
     if (!userData || !JSON.parse(userData).isLoggedIn) {
         // Guest mode dropdown
         dropdownContent = `
@@ -196,11 +259,11 @@ function createUserDropdown() {
             </div>
         `;
     }
-    
+
     const dropdown = document.createElement('div');
     dropdown.className = 'user-dropdown';
     dropdown.innerHTML = dropdownContent;
-    
+
     // Add dropdown styles
     dropdown.style.cssText = `
         position: absolute;
@@ -216,10 +279,10 @@ function createUserDropdown() {
         overflow: hidden;
         margin-top: 0.5rem;
     `;
-    
+
     userMenu.style.position = 'relative';
     userMenu.appendChild(dropdown);
-    
+
     // Add dropdown CSS styles to page
     if (!document.querySelector('#dropdown-styles')) {
         const style = document.createElement('style');
@@ -308,7 +371,7 @@ function showUserDropdown() {
         dropdown.style.display = 'block';
         dropdown.style.opacity = '0';
         dropdown.style.transform = 'translateY(-10px)';
-        
+
         setTimeout(() => {
             dropdown.style.transition = 'all 0.2s ease';
             dropdown.style.opacity = '1';
@@ -341,14 +404,14 @@ function showHelp() {
 
 function signOutFromDropdown() {
     hideUserDropdown();
-    
+
     const confirmed = confirm('Are you sure you want to sign out?\\n\\nYou will be redirected to the home page.');
-    
+
     if (confirmed) {
         // Clear user data
         localStorage.removeItem('bobolingoUser');
         localStorage.removeItem('bobolingoProfile');
-        
+
         // Redirect to home page
         window.location.href = 'index.html';
     }
@@ -357,26 +420,26 @@ function signOutFromDropdown() {
 // Navigation functionality
 function initializeNavigation() {
     navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             e.preventDefault();
-            
+
             const targetSection = this.getAttribute('data-section');
-            
+
             // Remove active class from all nav items and sections
             navLinks.forEach(navLink => navLink.parentElement.classList.remove('active'));
             contentSections.forEach(section => section.classList.remove('active'));
-            
+
             // Add active class to clicked nav item and corresponding section
             this.parentElement.classList.add('active');
             const targetElement = document.getElementById(targetSection);
             if (targetElement) {
                 targetElement.classList.add('active');
             }
-            
+
             // Add slide-in animation
             targetElement.style.opacity = '0';
             targetElement.style.transform = 'translateY(20px)';
-            
+
             setTimeout(() => {
                 targetElement.style.transition = 'all 0.3s ease';
                 targetElement.style.opacity = '1';
@@ -391,28 +454,28 @@ function navigateToLessons(courseType) {
     // Navigate to lessons section
     const lessonsNavLink = document.querySelector('[data-section="lessons"]');
     const lessonsSection = document.getElementById('lessons');
-    
+
     // Remove active class from all nav items and sections
     navLinks.forEach(navLink => navLink.parentElement.classList.remove('active'));
     contentSections.forEach(section => section.classList.remove('active'));
-    
+
     // Add active class to lessons nav item and section
     if (lessonsNavLink) {
         lessonsNavLink.parentElement.classList.add('active');
     }
-    
+
     if (lessonsSection) {
         lessonsSection.classList.add('active');
-        
+
         // Add slide-in animation
         lessonsSection.style.opacity = '0';
         lessonsSection.style.transform = 'translateY(20px)';
-        
+
         setTimeout(() => {
             lessonsSection.style.transition = 'all 0.3s ease';
             lessonsSection.style.opacity = '1';
             lessonsSection.style.transform = 'translateY(0)';
-            
+
             // Optional: Scroll to specific course based on courseType
             if (courseType === 'fundamentals' || courseType === 'grammar') {
                 const targetCourse = document.querySelector(`.course-card:nth-child(${courseType === 'fundamentals' ? '1' : '2'})`);
@@ -463,7 +526,7 @@ function showError(message) {
 // Animate stats on page load
 function animateStats() {
     const statNumbers = document.querySelectorAll('.stat-number');
-    
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -472,7 +535,7 @@ function animateStats() {
             }
         });
     });
-    
+
     statNumbers.forEach(stat => observer.observe(stat));
 }
 
@@ -481,33 +544,33 @@ function animateValue(element, start, end, duration) {
     const startTime = performance.now();
     const originalText = element.textContent;
     const suffix = originalText.replace(/[0-9]/g, '');
-    
+
     function update(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         const current = Math.floor(progress * (end - start) + start);
         element.textContent = current + suffix;
-        
+
         if (progress < 1) {
             requestAnimationFrame(update);
         }
     }
-    
+
     requestAnimationFrame(update);
 }
 
 // Add hover effects for lesson cards
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const lessonCards = document.querySelectorAll('.lesson-card');
-    
+
     lessonCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
+        card.addEventListener('mouseenter', function () {
             this.style.transform = 'translateY(-5px)';
             this.style.boxShadow = '0 10px 30px rgba(102, 126, 234, 0.15)';
         });
-        
-        card.addEventListener('mouseleave', function() {
+
+        card.addEventListener('mouseleave', function () {
             this.style.transform = 'translateY(-2px)';
             this.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
         });
@@ -515,7 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Add keyboard shortcuts
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     // Ctrl/Cmd + Enter to check grammar
     if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
         if (document.getElementById('grammar-checker').classList.contains('active')) {
@@ -523,7 +586,7 @@ document.addEventListener('keydown', function(event) {
             checkGrammar();
         }
     }
-    
+
     // Escape to clear results
     if (event.key === 'Escape') {
         if (document.getElementById('grammar-checker').classList.contains('active')) {
@@ -537,7 +600,7 @@ function updateCharacterCount() {
     const text = grammarInput.value;
     const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
     const charCount = text.length;
-    
+
     // You can add a character counter display if needed
     console.log(`Characters: ${charCount}, Words: ${wordCount}`);
 }
@@ -549,11 +612,11 @@ function toggleMobileMenu() {
 }
 
 // Add click handlers for lesson continue buttons
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const continueButtons = document.querySelectorAll('.lesson-button');
-    
+
     continueButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const lessonTitle = this.parentElement.querySelector('.lesson-title').textContent;
         });
     });
@@ -630,12 +693,12 @@ function startScrambify(level) {
     currentScrambleGame.level = level;
     currentScrambleGame.score = 0;
     currentScrambleGame.wordsCompleted = 0;
-    
+
     document.getElementById('scrambify-menu').style.display = 'none';
     document.getElementById('scrambify-game').style.display = 'block';
     document.getElementById('current-level').textContent = level.charAt(0).toUpperCase() + level.slice(1);
     document.getElementById('scramble-score').textContent = '0';
-    
+
     loadNewScrambleWord();
 }
 
@@ -651,38 +714,45 @@ function loadNewScrambleWord() {
     const words = scrambleWords[currentScrambleGame.level];
     const randomWord = words[Math.floor(Math.random() * words.length)];
     currentScrambleGame.currentWord = randomWord;
-    
+
     displayScrambledWord(randomWord.word);
     clearScrambleFeedback();
     hideScrambleHint();
-    
+
     document.getElementById('check-answer').style.display = 'inline-block';
+    document.getElementById('hint-button').style.display = 'inline-block';
     document.getElementById('next-word').style.display = 'none';
+    document.getElementById('stop-game').style.display = 'none';
 }
 
 // Display scrambled word
 function displayScrambledWord(word) {
     const container = document.getElementById('scrambled-letters');
     container.innerHTML = '';
-    
+
     const letters = word.split('').sort(() => Math.random() - 0.5);
-    
+
     letters.forEach(letter => {
         const letterTile = document.createElement('div');
         letterTile.classList.add('letter-tile');
         letterTile.textContent = letter.toUpperCase();
         letterTile.draggable = true;
-        
+
         // Add drag event listeners
         letterTile.addEventListener('dragstart', handleDragStart);
         letterTile.addEventListener('dragend', handleDragEnd);
         letterTile.addEventListener('dragover', handleDragOver);
         letterTile.addEventListener('drop', handleDrop);
-        
+
         container.appendChild(letterTile);
     });
 }
-
+function finishScrambifyGame() {
+    if (currentScrambleGame.score > 0) {
+        saveScrambifyScore(currentScrambleGame.score, currentScrambleGame.level, true);
+    }
+    backToScrambifyMenu();
+}
 // Drag and drop handlers
 let draggedElement = null;
 
@@ -701,12 +771,12 @@ function handleDragOver(e) {
 
 function handleDrop(e) {
     e.preventDefault();
-    
+
     if (draggedElement && e.target.classList.contains('letter-tile') && e.target !== draggedElement) {
         const container = e.target.parentNode;
         const draggedIndex = Array.from(container.children).indexOf(draggedElement);
         const targetIndex = Array.from(container.children).indexOf(e.target);
-        
+
         if (draggedIndex < targetIndex) {
             container.insertBefore(draggedElement, e.target.nextSibling);
         } else {
@@ -720,15 +790,17 @@ function checkScrambleAnswer() {
     const container = document.getElementById('scrambled-letters');
     const letters = Array.from(container.children).map(tile => tile.textContent.toLowerCase()).join('');
     const correctWord = currentScrambleGame.currentWord.word;
-    
+
     if (letters === correctWord) {
         showScrambleFeedback('Correct! Well done! 🎉', 'success');
         currentScrambleGame.score += getScoreForLevel(currentScrambleGame.level);
         currentScrambleGame.wordsCompleted++;
         document.getElementById('scramble-score').textContent = currentScrambleGame.score;
-        
+
         document.getElementById('check-answer').style.display = 'none';
+        document.getElementById('hint-button').style.display = 'none';
         document.getElementById('next-word').style.display = 'inline-block';
+        document.getElementById('stop-game').style.display = 'inline-block';
     } else {
         showScrambleFeedback('Not quite right. Try again! 🤔', 'error');
     }
@@ -811,7 +883,7 @@ let currentMemoryGame = {
 function startmemorybo() {
     document.getElementById('memorybo-menu').style.display = 'none';
     document.getElementById('memorybo-game').style.display = 'block';
-    
+
     initializeMemoryGame();
 }
 
@@ -826,10 +898,10 @@ function initializeMemoryGame() {
     currentMemoryGame.flippedCards = [];
     currentMemoryGame.matchedPairs = 0;
     currentMemoryGame.attempts = 0;
-    
+
     // Select random word pairs
     const selectedWords = memoryWords.sort(() => 0.5 - Math.random()).slice(0, 6);
-    
+
     // Create card pairs
     currentMemoryGame.cards = [];
     selectedWords.forEach((wordPair, index) => {
@@ -846,10 +918,10 @@ function initializeMemoryGame() {
             pairId: index
         });
     });
-    
+
     // Shuffle cards
     currentMemoryGame.cards = currentMemoryGame.cards.sort(() => 0.5 - Math.random());
-    
+
     updateMemoryUI();
     renderMemoryBoard();
 }
@@ -858,7 +930,7 @@ function initializeMemoryGame() {
 function renderMemoryBoard() {
     const board = document.getElementById('memory-board');
     board.innerHTML = '';
-    
+
     currentMemoryGame.cards.forEach((card, index) => {
         const cardElement = document.createElement('div');
         cardElement.classList.add('memory-card');
@@ -866,9 +938,9 @@ function renderMemoryBoard() {
         cardElement.dataset.pairId = card.pairId;
         cardElement.dataset.type = card.type;
         cardElement.textContent = '?';
-        
+
         cardElement.addEventListener('click', flipMemoryCard);
-        
+
         board.appendChild(cardElement);
     });
 }
@@ -877,19 +949,19 @@ function renderMemoryBoard() {
 function flipMemoryCard(e) {
     const card = e.target;
     const cardIndex = parseInt(card.dataset.cardIndex);
-    
+
     // Don't allow flipping if card is already flipped or matched, or if two cards are already flipped
-    if (card.classList.contains('flipped') || 
-        card.classList.contains('matched') || 
+    if (card.classList.contains('flipped') ||
+        card.classList.contains('matched') ||
         currentMemoryGame.flippedCards.length >= 2) {
         return;
     }
-    
+
     // Flip the card
     card.classList.add('flipped');
     card.textContent = currentMemoryGame.cards[cardIndex].content;
     currentMemoryGame.flippedCards.push(cardIndex);
-    
+
     // Check for match when two cards are flipped
     if (currentMemoryGame.flippedCards.length === 2) {
         setTimeout(checkMemoryMatch, 1000);
@@ -897,28 +969,43 @@ function flipMemoryCard(e) {
 }
 
 // Check for memory match
-function checkMemoryMatch() {
+async function checkMemoryMatch() {
     const [firstIndex, secondIndex] = currentMemoryGame.flippedCards;
     const firstCard = document.querySelector(`[data-card-index="${firstIndex}"]`);
     const secondCard = document.querySelector(`[data-card-index="${secondIndex}"]`);
-    
+
     const firstPairId = currentMemoryGame.cards[firstIndex].pairId;
     const secondPairId = currentMemoryGame.cards[secondIndex].pairId;
-    
+
     currentMemoryGame.attempts++;
-    
+
     if (firstPairId === secondPairId) {
         // Match found
         firstCard.classList.add('matched');
         secondCard.classList.add('matched');
         currentMemoryGame.matchedPairs++;
-        
+
         showMemoryFeedback('Great match! 🎉', 'success');
-        
+
         // Check if game is complete
         if (currentMemoryGame.matchedPairs === currentMemoryGame.totalPairs) {
+            // Hitung skor (misal: 100 poin per pair - attempts sebagai penalty)
+            const score = Math.max(100, 600 - currentMemoryGame.attempts * 10);
+
+            // Simpan skor ke backend
+            try {
+                if (typeof window.API !== 'undefined' && window.API.game) {
+                    await window.API.game.saveScore('memoribo', score, 'medium', true);
+                } else {
+                    console.warn('❌ window.API belum siap, skor tidak disimpan');
+                }
+                console.log('✅ Skor Memoribo tersimpan:', score);
+            } catch (err) {
+                console.error('❌ Gagal simpan skor:', err);
+            }
+
             setTimeout(() => {
-                showMemoryFeedback(`Congratulations! You completed the game in ${currentMemoryGame.attempts} attempts! 🏆`, 'success');
+                showMemoryFeedback(`Congratulations! You scored ${score} points! 🏆`, 'success');
             }, 500);
         }
     } else {
@@ -929,10 +1016,10 @@ function checkMemoryMatch() {
             firstCard.textContent = '?';
             secondCard.textContent = '?';
         }, 500);
-        
+
         showMemoryFeedback('No match. Try again! 🤔', 'info');
     }
-    
+
     currentMemoryGame.flippedCards = [];
     updateMemoryUI();
 }
@@ -955,7 +1042,7 @@ function showMemoryFeedback(message, type) {
     const feedback = document.getElementById('memory-feedback');
     feedback.textContent = message;
     feedback.className = `game-feedback ${type}`;
-    
+
     setTimeout(() => {
         if (type !== 'success' || !message.includes('Congratulations')) {
             clearMemoryFeedback();
@@ -969,3 +1056,25 @@ function clearMemoryFeedback() {
     feedback.textContent = '';
     feedback.className = 'game-feedback';
 }
+async function saveScrambifyScore(score, level, completed = false) {
+    if (typeof window.API?.game?.saveScore !== 'function') {
+        console.warn('API tidak tersedia');
+        return;
+    }
+    try {
+        await window.API.game.saveScore('scrambobo', score, level, completed);
+        console.log('✅ Skor Scrambify tersimpan:', score);
+    } catch (err) {
+        console.error('❌ Gagal simpan skor:', err);
+    }
+}
+window.startScrambobo = startScrambobo;
+window.backToScramboboMenu = backToScramboboMenu;
+window.checkScrambleAnswer = checkScrambleAnswer;
+window.showScrambleHint = showScrambleHint;
+window.nextScrambleWord = nextScrambleWord;
+
+window.startmemorybo = startmemorybo;
+window.backTomemoryboMenu = backTomemoryboMenu;
+window.resetMemoryGame = resetMemoryGame;
+window.finishScrambifyGame = finishScrambifyGame;

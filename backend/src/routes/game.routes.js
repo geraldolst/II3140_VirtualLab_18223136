@@ -16,16 +16,17 @@ router.post('/save-score', authMiddleware, validateGameScore, async (req, res) =
             .insert({
                 user_id: userId,
                 game_type,
-                score,
-                difficulty,
-                completed: completed || false,
-                played_at: new Date().toISOString()
+                score: parseInt(score) || 0,            // pastikan integer
+                // difficulty: difficulty || 'medium',
+                // completed_at: new Date().toISOString(),  // ✅ sesuai nama kolom
+                // time_taken: null                        // ✅ tambahkan field ini
             })
             .select()
             .single();
 
         if (error) {
-            console.error('Save score error:', error);
+            console.error('Save score error:', error); // ← ini sudah ada
+            console.error('Full error details:', JSON.stringify(error, null, 2));
             return res.status(STATUS.SERVER_ERROR).json({
                 success: false,
                 message: 'Failed to save score'
@@ -38,7 +39,8 @@ router.post('/save-score', authMiddleware, validateGameScore, async (req, res) =
             data: { score: savedScore }
         });
     } catch (error) {
-        console.error('Save score error:', error);
+        console.error('Save score error:', error); // ← ini sudah ada
+        console.error('Full error details:', JSON.stringify(error, null, 2));
         res.status(STATUS.SERVER_ERROR).json({
             success: false,
             message: 'Failed to save score'
@@ -152,10 +154,10 @@ router.get('/stats/:game_type', authMiddleware, async (req, res) => {
         const stats = {
             totalPlayed: scores.length,
             totalScore: scores.reduce((sum, s) => sum + (s.score || 0), 0),
-            averageScore: scores.length > 0 
-                ? Math.round(scores.reduce((sum, s) => sum + (s.score || 0), 0) / scores.length) 
+            averageScore: scores.length > 0
+                ? Math.round(scores.reduce((sum, s) => sum + (s.score || 0), 0) / scores.length)
                 : 0,
-            highestScore: scores.length > 0 
+            highestScore: scores.length > 0
                 ? Math.max(...scores.map(s => s.score || 0))
                 : 0,
             completionRate: scores.length > 0

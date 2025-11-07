@@ -13,7 +13,7 @@ const loadingProgressBar = document.querySelector('.loading-progress');
 const loadingPercentage = document.querySelector('.loading-percentage');
 
 // Initialize loading when page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     startLoading();
 });
 
@@ -21,34 +21,34 @@ document.addEventListener('DOMContentLoaded', function() {
 function startLoading() {
     loadingProgress = 0;
     const incrementTime = loadingDuration / loadingSteps;
-    
+
     loadingInterval = setInterval(() => {
         loadingProgress += 1;
-        
+
         // Update progress bar
         loadingProgressBar.style.width = loadingProgress + '%';
         loadingPercentage.textContent = loadingProgress + '%';
-        
+
         // Complete loading
         if (loadingProgress >= 100) {
             clearInterval(loadingInterval);
             setTimeout(completeLoading, 500); // Wait a bit before transitioning
         }
     }, incrementTime);
-    
+
     // Add some random variations to make it feel more realistic
     setTimeout(() => {
         if (loadingProgress < 30) {
             loadingProgress = 30;
         }
     }, 800);
-    
+
     setTimeout(() => {
         if (loadingProgress < 60) {
             loadingProgress = 60;
         }
     }, 1500);
-    
+
     setTimeout(() => {
         if (loadingProgress < 85) {
             loadingProgress = 85;
@@ -60,12 +60,12 @@ function startLoading() {
 function completeLoading() {
     // Hide loading screen with fade out
     loadingScreen.classList.add('hidden');
-    
+
     // Show welcome content after loading screen fades
     setTimeout(() => {
         loadingScreen.style.display = 'none';
         welcomeContent.style.display = 'block';
-        
+
         // Start typing animation for greeting
         startTypingAnimation();
     }, 500);
@@ -77,10 +77,10 @@ function startTypingAnimation() {
     const cursor = document.querySelector('.typing-cursor');
     const text = 'Hi!';
     let index = 0;
-    
+
     // Clear initial text
     greetingWord.textContent = '';
-    
+
     // Type each character
     const typingInterval = setInterval(() => {
         if (index < text.length) {
@@ -101,12 +101,12 @@ function startLearning() {
     // Add click animation
     const continueBtn = document.querySelector('.continue-btn');
     continueBtn.style.transform = 'scale(0.95)';
-    
+
     setTimeout(() => {
         continueBtn.style.transform = 'scale(1)';
-        
+
         // Navigate to login page (same directory)
-        window.location.href = 'login.html';
+        // window.location.href = 'login.html';
     }, 150);
 }
 
@@ -118,9 +118,9 @@ function showWelcomeMessage() {
         "📚 Your adventure begins now!",
         "🚀 Ready to unlock new languages?"
     ];
-    
+
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-    
+
     // Create popup message
     const popup = document.createElement('div');
     popup.className = 'welcome-popup';
@@ -131,7 +131,7 @@ function showWelcomeMessage() {
             <button onclick="closePopup()" class="btn btn-primary">OK</button>
         </div>
     `;
-    
+
     // Add popup styles
     popup.style.cssText = `
         position: fixed;
@@ -146,7 +146,7 @@ function showWelcomeMessage() {
         z-index: 10000;
         animation: fadeIn 0.3s ease;
     `;
-    
+
     const popupContent = popup.querySelector('.popup-content');
     popupContent.style.cssText = `
         background: white;
@@ -157,7 +157,7 @@ function showWelcomeMessage() {
         margin: 0 1rem;
         animation: slideInUp 0.3s ease;
     `;
-    
+
     document.body.appendChild(popup);
 }
 
@@ -199,17 +199,17 @@ style.textContent = `
 document.head.appendChild(style);
 
 // Add hover effects for mascot
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const mascot = document.querySelector('.mascot-character');
-    
+
     if (mascot) {
-        mascot.addEventListener('mouseenter', function() {
+        mascot.addEventListener('mouseenter', function () {
             this.style.animation = 'none';
             this.style.transform = 'scale(1.2) rotate(10deg)';
             this.style.transition = 'all 0.3s ease';
         });
-        
-        mascot.addEventListener('mouseleave', function() {
+
+        mascot.addEventListener('mouseleave', function () {
             this.style.animation = 'bounce 2s ease-in-out infinite';
             this.style.transform = 'scale(1) rotate(0deg)';
         });
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Keyboard navigation
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     // Press Enter or Space to continue
     if (event.key === 'Enter' || event.key === ' ') {
         const continueBtn = document.querySelector('.continue-btn');
@@ -226,7 +226,7 @@ document.addEventListener('keydown', function(event) {
             startLearning();
         }
     }
-    
+
     // Press Escape to close popup
     if (event.key === 'Escape') {
         closePopup();
@@ -235,7 +235,7 @@ document.addEventListener('keydown', function(event) {
 
 // Add loading screen click to skip (for development/testing)
 if (loadingScreen) {
-    loadingScreen.addEventListener('click', function() {
+    loadingScreen.addEventListener('click', function () {
         if (loadingProgress < 100) {
             clearInterval(loadingInterval);
             loadingProgress = 100;

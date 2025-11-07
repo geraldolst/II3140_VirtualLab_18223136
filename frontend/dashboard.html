@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <!-- Header Navigation -->
     <header class="header dashboard-header">
@@ -18,7 +20,7 @@
                     <a href="index.html" class="logo-link">Bobolingo</a>
                     <img src="assets/snoopy-removebg-preview.png" alt="Snoopy Logo" class="logo-icon">
                 </div>
-                
+
                 <div class="nav-right">
                     <div class="user-menu">
                         <div class="user-avatar">
@@ -127,7 +129,7 @@
                             <p class="stat-label">Day Streak</p>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-star"></i>
@@ -137,7 +139,7 @@
                             <p class="stat-label">XP Points</p>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-clock"></i>
@@ -147,7 +149,7 @@
                             <p class="stat-label">Minutes Today</p>
                         </div>
                     </div>
-                    
+
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-trophy"></i>
@@ -177,7 +179,7 @@
                             </div>
                             <button class="lesson-button" onclick="navigateToLessons('fundamentals')">Continue</button>
                         </div>
-                        
+
                         <div class="lesson-card">
                             <div class="lesson-flag">📖</div>
                             <div class="lesson-content">
@@ -213,14 +215,11 @@
                                 </select>
                             </div>
                         </div>
-                        
-                        <textarea 
-                            id="grammarInput" 
-                            class="grammar-textarea" 
+
+                        <textarea id="grammarInput" class="grammar-textarea"
                             placeholder="Type or paste your text here to check for grammar errors..."
-                            rows="8"
-                        ></textarea>
-                        
+                            rows="8"></textarea>
+
                         <div class="grammar-actions">
                             <button id="checkGrammar" class="btn btn-primary">
                                 <i class="fas fa-search"></i>
@@ -260,7 +259,7 @@
                 </div>
 
                 <!-- Game Selection -->
-                <div id="scrambobo-menu" class="game-menu">
+                <div id="scrambify-menu" class="game-menu">
                     <div class="game-intro">
                         <div class="game-description">
                             <h3>How to Play Scrambobo</h3>
@@ -272,21 +271,21 @@
                             </ul>
                         </div>
                     </div>
-                    
+
                     <div class="difficulty-selection">
                         <h3>Choose Difficulty Level</h3>
                         <div class="difficulty-buttons">
-                            <button class="difficulty-btn easy" onclick="startScrambobo('easy')">
+                            <button class="difficulty-btn easy" onclick="startScrambify('easy')">
                                 <i class="fas fa-seedling"></i>
                                 <span>Easy</span>
                                 <small>3-5 letters</small>
                             </button>
-                            <button class="difficulty-btn medium" onclick="startScrambobo('medium')">
+                            <button class="difficulty-btn medium" onclick="startScrambify('medium')">
                                 <i class="fas fa-fire"></i>
                                 <span>Medium</span>
                                 <small>6-8 letters</small>
                             </button>
-                            <button class="difficulty-btn hard" onclick="startScrambobo('hard')">
+                            <button class="difficulty-btn hard" onclick="startScrambify('hard')">
                                 <i class="fas fa-crown"></i>
                                 <span>Hard</span>
                                 <small>9+ letters</small>
@@ -296,7 +295,7 @@
                 </div>
 
                 <!-- Game Interface -->
-                <div id="scrambobo-game" class="game-interface" style="display: none;">
+                <div id="scrambify-game" class="game-interface" style="display: none;">
                     <div class="game-header">
                         <div class="game-info">
                             <div class="level-indicator">
@@ -310,25 +309,29 @@
                             <i class="fas fa-arrow-left"></i> Back
                         </button>
                     </div>
-                    
+
                     <div class="game-content">
                         <div class="word-container">
                             <h3>Unscramble this word:</h3>
                             <div id="scrambled-letters" class="letters-container"></div>
                         </div>
-                        
+
                         <div class="game-controls">
                             <button id="check-answer" class="btn btn-primary" onclick="checkScrambleAnswer()">
                                 <i class="fas fa-check"></i> Check Answer
                             </button>
-                            <button id="hint-button" class="btn btn-secondary" onclick="showScrambleHint()">
+                            <button id="hint-button" class="btn btn-yellow" onclick="showScrambleHint()">
                                 <i class="fas fa-lightbulb"></i> Hint
                             </button>
-                            <button id="next-word" class="btn btn-success" onclick="nextScrambleWord()" style="display: none;">
+                            <button id="next-word" class="btn btn-success" onclick="nextScrambleWord()"
+                                style="display: none;">
                                 <i class="fas fa-arrow-right"></i> Next Word
                             </button>
+                            <button id="stop-game" class="btn btn-red" onclick="finishScrambifyGame()">
+                                <i class="fas fa-check-circle"></i> Selesai
+                            </button>
                         </div>
-                        
+
                         <div id="scramble-feedback" class="game-feedback"></div>
                         <div id="scramble-hint" class="hint-display"></div>
                     </div>
@@ -355,7 +358,7 @@
                             </ul>
                         </div>
                     </div>
-                    
+
                     <div class="start-game-section">
                         <button class="btn btn-large btn-primary" onclick="startmemorybo()">
                             <i class="fas fa-play"></i>
@@ -379,11 +382,11 @@
                             <i class="fas fa-arrow-left"></i> Back
                         </button>
                     </div>
-                    
+
                     <div class="game-content">
                         <div id="memory-board" class="memory-board"></div>
                         <div id="memory-feedback" class="game-feedback"></div>
-                        
+
                         <div class="game-controls">
                             <button id="reset-memory" class="btn btn-secondary" onclick="resetMemoryGame()">
                                 <i class="fas fa-redo"></i> Reset Game
@@ -399,7 +402,7 @@
                     <h1 class="section-title">Lessons 📚</h1>
                     <p class="section-subtitle">Learn English with comprehensive YouTube courses</p>
                 </div>
-                
+
                 <div class="lessons-container">
                     <!-- English Fundamentals Course -->
                     <div class="course-card">
@@ -409,7 +412,8 @@
                             </div>
                             <div class="course-info">
                                 <h3 class="course-title">English Fundamentals</h3>
-                                <p class="course-description">Master the basics of English language with comprehensive fundamentals</p>
+                                <p class="course-description">Master the basics of English language with comprehensive
+                                    fundamentals</p>
                                 <div class="course-meta">
                                     <span class="course-duration"><i class="fas fa-clock"></i> Full Course</span>
                                     <span class="course-level"><i class="fas fa-star"></i> Beginner</span>
@@ -417,7 +421,8 @@
                             </div>
                         </div>
                         <div class="course-actions">
-                            <a href="https://youtu.be/CbPy_CjJR90?si=Jgc4ZZlrFDnIoTVO" target="_blank" class="btn btn-primary course-btn">
+                            <a href="https://youtu.be/CbPy_CjJR90?si=Jgc4ZZlrFDnIoTVO" target="_blank"
+                                class="btn btn-primary course-btn">
                                 <i class="fab fa-youtube"></i>
                                 Watch on YouTube
                             </a>
@@ -432,7 +437,8 @@
                             </div>
                             <div class="course-info">
                                 <h3 class="course-title">English Grammar</h3>
-                                <p class="course-description">Learn essential English grammar rules and structure for better communication</p>
+                                <p class="course-description">Learn essential English grammar rules and structure for
+                                    better communication</p>
                                 <div class="course-meta">
                                     <span class="course-duration"><i class="fas fa-clock"></i> Full Course</span>
                                     <span class="course-level"><i class="fas fa-star"></i> Intermediate</span>
@@ -440,7 +446,8 @@
                             </div>
                         </div>
                         <div class="course-actions">
-                            <a href="https://youtu.be/B2IldXHBDA0?si=0BSU6BC9OWtFv5DS" target="_blank" class="btn btn-primary course-btn">
+                            <a href="https://youtu.be/B2IldXHBDA0?si=0BSU6BC9OWtFv5DS" target="_blank"
+                                class="btn btn-primary course-btn">
                                 <i class="fab fa-youtube"></i>
                                 Watch on YouTube
                             </a>
@@ -455,7 +462,8 @@
                             </div>
                             <div class="course-info">
                                 <h3 class="course-title">English Conversation</h3>
-                                <p class="course-description">Practice speaking and improve your conversational English skills</p>
+                                <p class="course-description">Practice speaking and improve your conversational English
+                                    skills</p>
                                 <div class="course-meta">
                                     <span class="course-duration"><i class="fas fa-clock"></i> Coming Soon</span>
                                     <span class="course-level"><i class="fas fa-star"></i> Advanced</span>
@@ -477,7 +485,8 @@
                             </div>
                             <div class="course-info">
                                 <h3 class="course-title">Pronunciation & Phonics</h3>
-                                <p class="course-description">Perfect your English pronunciation with phonetic exercises</p>
+                                <p class="course-description">Perfect your English pronunciation with phonetic exercises
+                                </p>
                                 <div class="course-meta">
                                     <span class="course-duration"><i class="fas fa-clock"></i> Coming Soon</span>
                                     <span class="course-level"><i class="fas fa-star"></i> Intermediate</span>
@@ -555,7 +564,10 @@
             </section>
         </main>
     </div>
-
+    <!-- Load config.js FIRST (defines window.API) -->
+    <script src="javascript/config.js"></script>
+    <!-- Then load dashboard.js -->
     <script src="javascript/dashboard.js"></script>
 </body>
+
 </html>
