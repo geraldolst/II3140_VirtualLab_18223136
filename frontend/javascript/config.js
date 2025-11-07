@@ -1,8 +1,8 @@
 // API Configuration
 const CONFIG = {
-    // API URL - always use Railway for now (local backend has issues)
-    // API_URL: 'https://ii3140virtuallab18223136-production.up.railway.app/api',
-    API_URL: 'http://localhost:3001/api',
+    // API URL - use Railway backend for production
+    API_URL: 'https://ii3140virtuallab18223136-production.up.railway.app/api',
+    // API_URL: 'http://localhost:3001/api', // Uncomment for local testing
 
     // Supabase (untuk auth di frontend - optional)
     SUPABASE_URL: 'https://inlksxdnfiruqaiumofw.supabase.co',

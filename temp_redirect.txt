@@ -1,0 +1,5 @@
+                    console.log(' SUCCESS! Redirecting to dashboard...');
+                    btnText.textContent = ' Success!';
+                    
+                    // Redirect immediately without alert
+                    window.location.href = 'dashboard.html';
