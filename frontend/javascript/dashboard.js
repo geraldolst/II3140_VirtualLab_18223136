@@ -144,7 +144,7 @@ async function loadUserData(user) {
 
     // Load user stats and tier
     await loadUserStats();
-    
+
     // Load game history
     await loadGameHistory();
 }
@@ -173,24 +173,24 @@ async function loadUserStats() {
     try {
         // Get user stats from backend
         const statsResponse = await window.API.user.getStats();
-        
+
         if (statsResponse.success && statsResponse.data) {
             const stats = statsResponse.data.stats;
-            
+
             // Calculate total score
             const totalScore = stats.totalScore || 0;
             const scramboboGames = stats.scramboboGames || 0;
             const memoriboGames = stats.memoriboGames || 0;
             const totalGames = scramboboGames + memoriboGames;
-            
+
             // Calculate tier
             const tier = calculateTier(totalScore);
-            
+
             // Update stats cards
             updateStatsCard(0, totalScore, 'Total Points', '⭐');
             updateStatsCard(1, tier.name, 'Current Tier', tier.icon);
             updateStatsCard(2, totalGames, 'Games Played', '🎮');
-            
+
             // Display tier badge
             displayTierBadge(tier, totalScore);
         } else {
@@ -215,7 +215,7 @@ function updateStatsCard(index, value, label, icon) {
         const numberElement = statCards[index].querySelector('.stat-number');
         const labelElement = statCards[index].querySelector('.stat-label');
         const iconElement = statCards[index].querySelector('.stat-icon i');
-        
+
         if (numberElement) {
             numberElement.textContent = value;
         }
@@ -233,7 +233,7 @@ function updateStatsCard(index, value, label, icon) {
 function displayTierBadge(tier, totalScore) {
     // Create or update tier badge
     let tierBadge = document.querySelector('.tier-badge');
-    
+
     if (!tierBadge) {
         const statsGrid = document.querySelector('.stats-grid');
         if (statsGrid) {
@@ -244,7 +244,7 @@ function displayTierBadge(tier, totalScore) {
             return;
         }
     }
-    
+
     // Calculate progress to next tier
     const tiers = [
         { name: 'Bronze', min: 0, max: 499 },
@@ -254,15 +254,15 @@ function displayTierBadge(tier, totalScore) {
         { name: 'Diamond', min: 5000, max: 9999 },
         { name: 'Master', min: 10000, max: Infinity }
     ];
-    
+
     const currentTierIndex = tiers.findIndex(t => t.name === tier.name);
     const nextTier = currentTierIndex < tiers.length - 1 ? tiers[currentTierIndex + 1] : null;
-    
+
     let progressHtml = '';
     if (nextTier) {
         const pointsNeeded = nextTier.min - totalScore;
         const progressPercent = ((totalScore - tier.min) / (tier.max - tier.min + 1)) * 100;
-        
+
         progressHtml = `
             <div class="tier-progress">
                 <div class="tier-progress-bar" style="width: ${progressPercent}%"></div>
@@ -272,7 +272,7 @@ function displayTierBadge(tier, totalScore) {
     } else {
         progressHtml = '<p class="tier-next">🎉 Maximum tier reached!</p>';
     }
-    
+
     tierBadge.innerHTML = `
         <div class="tier-info">
             <span class="tier-icon" style="font-size: 48px;">${tier.icon}</span>
@@ -287,7 +287,7 @@ function displayTierBadge(tier, totalScore) {
 async function loadGameHistory() {
     try {
         const historyResponse = await window.API.game.getHistory();
-        
+
         if (historyResponse.success && historyResponse.data) {
             const games = historyResponse.data.games || [];
             displayGameHistory(games);
@@ -301,7 +301,7 @@ async function loadGameHistory() {
 function displayGameHistory(games) {
     // Find or create game history section
     let historySection = document.getElementById('game-history-section');
-    
+
     if (!historySection) {
         const dashboardSection = document.getElementById('dashboard');
         if (dashboardSection) {
@@ -313,7 +313,7 @@ function displayGameHistory(games) {
             return;
         }
     }
-    
+
     if (games.length === 0) {
         historySection.innerHTML = `
             <div class="history-header">
@@ -323,23 +323,23 @@ function displayGameHistory(games) {
         `;
         return;
     }
-    
+
     // Group games by type
     const scramboboGames = games.filter(g => g.game_type === 'scrambobo').slice(0, 5);
     const memoriboGames = games.filter(g => g.game_type === 'memorybo').slice(0, 5);
-    
+
     let historyHtml = `
         <div class="history-header">
             <h2>🎮 Recent Games</h2>
         </div>
         <div class="game-stats-grid">
     `;
-    
+
     // Scrambobo stats
     if (scramboboGames.length > 0) {
         const avgScore = Math.round(scramboboGames.reduce((sum, g) => sum + g.score, 0) / scramboboGames.length);
         const bestScore = Math.max(...scramboboGames.map(g => g.score));
-        
+
         historyHtml += `
             <div class="game-stat-card">
                 <h3>🧩 Scrambobo</h3>
@@ -358,12 +358,12 @@ function displayGameHistory(games) {
             </div>
         `;
     }
-    
+
     // Memorybo stats
     if (memoriboGames.length > 0) {
         const avgScore = Math.round(memoriboGames.reduce((sum, g) => sum + g.score, 0) / memoriboGames.length);
         const bestScore = Math.max(...memoriboGames.map(g => g.score));
-        
+
         historyHtml += `
             <div class="game-stat-card">
                 <h3>🧠 Memorybo</h3>
@@ -382,7 +382,7 @@ function displayGameHistory(games) {
             </div>
         `;
     }
-    
+
     historyHtml += '</div>';
     historySection.innerHTML = historyHtml;
 }
@@ -443,20 +443,20 @@ function createUserDropdown() {
             </div>
             <div class="dropdown-divider"></div>
             <div class="dropdown-menu">
-                <a href="login.html" class="dropdown-item">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Sign In</span>
-                </a>
-                <a href="welcome.html" class="dropdown-item">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Sign Up</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item" onclick="showHelp()">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Help & Support</span>
-                </a>
-            </div>
+        <a href="profile.html" class="dropdown-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+        <a href="#" class="dropdown-item" onclick="showSettings()">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item danger" onclick="signOutFromDropdown()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Sign Out</span>
+        </a>
+    </div>
         `;
     } else {
         // Logged in user dropdown
